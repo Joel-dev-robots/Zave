@@ -1,0 +1,136 @@
+@import './styles/fonts.css';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-gray-50 text-gray-900;
+  }
+
+  /* Eliminando estilos personalizados ya que ahora usamos las clases dark: de Tailwind */
+}
+
+@layer components {
+  /* Transitions */
+  .transition-smooth {
+    @apply transition-all duration-300 ease-in-out;
+  }
+
+  /* Shadows with colored borders */
+  .shadow-card {
+    @apply shadow-md border border-gray-200;
+  }
+  .shadow-card-primary {
+    @apply shadow-md border border-primary-200;
+  }
+  .shadow-card-success {
+    @apply shadow-md border border-success-200;
+  }
+  .shadow-card-warning {
+    @apply shadow-md border border-warning-200;
+  }
+  .shadow-card-danger {
+    @apply shadow-md border border-danger-200;
+  }
+
+  /* Form controls */
+  .form-input {
+    @apply px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 
+    focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500;
+  }
+
+  .form-select {
+    @apply block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm 
+    focus:outline-none focus:ring-primary-500 focus:border-primary-500;
+  }
+
+  .form-checkbox {
+    @apply h-4 w-4 text-primary-600 border-gray-300 rounded
+    focus:ring-primary-500 focus:ring-offset-0;
+  }
+
+  .form-radio {
+    @apply h-4 w-4 text-primary-600 border-gray-300
+    focus:ring-primary-500 focus:ring-offset-0;
+  }
+
+  /* Custom scrollbar for webkit browsers */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-gray-100;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    @apply bg-gray-400 rounded-full hover:bg-gray-500;
+  }
+}
+
+/* Custom styles below */
+
+:root {
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+}
+
+/* Remove all the default Vite styles that might conflict with Tailwind */
+
+a {
+  font-weight: 500;
+  color: #646cff;
+  text-decoration: inherit;
+}
+a:hover {
+  color: #535bf2;
+}
+
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
+}
+
+button {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #1a1a1a;
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+button:hover {
+  border-color: #646cff;
+}
+button:focus,
+button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    color: #213547;
+    background-color: #ffffff;
+  }
+  a:hover {
+    color: #747bff;
+  }
+  button {
+    background-color: #f9f9f9;
+  }
+}

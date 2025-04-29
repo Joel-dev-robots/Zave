@@ -1,0 +1,409 @@
+import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { format } from 'date-fns';
+import { Bar, Line } from 'react-chartjs-2';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  LineElement,
+  PointElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler,
+} from 'chart.js';
+
+import { getCurrentBalance, getTotalIncome, getTotalExpenses } from '../../services/transactionService';
+import { getGoalStatistics } from '../../services/goalService';
+import { getInvestmentStatistics } from '../../services/investmentService';
+import { getData, KEYS } from '../../services/storageService';
+
+// Import components
+import StatsCard from '../molecules/StatsCard';
+import ChartCard from '../molecules/ChartCard';
+import TransactionList from '../molecules/TransactionList';
+import Card from '../atoms/Card';
+import Button from '../atoms/Button';
+import ProgressBar from '../atoms/ProgressBar';
+
+// Register Chart.js components
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  LineElement,
+  PointElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler
+);
+
+const Dashboard = () => {
+  const [balance, setBalance] = useState(0);
+  const [income, setIncome] = useState(0);
+  const [expenses, setExpenses] = useState(0);
+  const [goalStats, setGoalStats] = useState({});
+  const [investmentStats, setInvestmentStats] = useState({});
+  const [recentTransactions, setRecentTransactions] = useState([]);
+
+  useEffect(() => {
+    // Load data
+    setBalance(getCurrentBalance());
+    setIncome(getTotalIncome());
+    setExpenses(getTotalExpenses());
+    setGoalStats(getGoalStatistics());
+    setInvestmentStats(getInvestmentStatistics());
+    
+    // Get recent transactions
+    const allTransactions = getData(KEYS.TRANSACTIONS, []);
+    const sorted = [...allTransactions]
+      .sort((a, b) => new Date(b.date) - new Date(a.date))
+      .slice(0, 5);
+    setRecentTransactions(sorted);
+  }, []);
+
+  // Income vs Expenses Chart
+  const comparisonChartData = {
+    labels: ['Income', 'Expenses'],
+    datasets: [
+      {
+        label: 'Amount (€)',
+        data: [income, expenses],
+        backgroundColor: [
+          'rgba(16, 185, 129, 0.7)', // success-500 with opacity
+          'rgba(239, 68, 68, 0.7)', // danger-500 with opacity
+        ],
+        borderColor: [
+          'rgb(16, 185, 129)', // success-500
+          'rgb(239, 68, 68)', // danger-500
+        ],
+        borderWidth: 1,
+      },
+    ],
+  };
+
+  const comparisonChartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: 'top',
+        labels: {
+          font: {
+            family: "'Inter', sans-serif",
+            size: 12
+          },
+          color: '#6b7280', // text-gray-500
+        }
+      },
+      tooltip: {
+        backgroundColor: 'rgba(255, 255, 255, 0.9)',
+        titleColor: '#1f2937', // text-gray-800
+        bodyColor: '#374151', // text-gray-700
+        borderColor: '#e5e7eb', // border-gray-200
+        borderWidth: 1,
+        padding: 12,
+        boxPadding: 6,
+        usePointStyle: true,
+        bodyFont: {
+          family: "'Inter', sans-serif"
+        },
+        titleFont: {
+          family: "'Inter', sans-serif",
+          weight: 'bold'
+        }
+      },
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        grid: {
+          color: 'rgba(229, 231, 235, 0.5)', // gray-200 with opacity
+        },
+        ticks: {
+          font: {
+            family: "'Inter', sans-serif"
+          },
+          color: '#6b7280', // text-gray-500
+          callback: (value) => `€${value}`
+        }
+      },
+      x: {
+        grid: {
+          display: false
+        },
+        ticks: {
+          font: {
+            family: "'Inter', sans-serif"
+          },
+          color: '#6b7280' // text-gray-500
+        }
+      }
+    }
+  };
+
+  // Monthly balance chart (fake data for now)
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
+  const balanceChartData = {
+    labels: months,
+    datasets: [
+      {
+        label: 'Balance',
+        data: [1200, 1900, 1700, 2100, 2300, balance],
+        borderColor: 'rgb(59, 130, 246)', // primary-500
+        backgroundColor: 'rgba(59, 130, 246, 0.1)', // primary-500 with low opacity
+        tension: 0.3,
+        fill: true,
+        pointBackgroundColor: 'rgb(59, 130, 246)',
+        pointBorderColor: '#fff',
+        pointBorderWidth: 2,
+        pointRadius: 4,
+        pointHoverRadius: 6,
+      },
+    ],
+  };
+
+  const balanceChartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        display: false
+      },
+      tooltip: {
+        backgroundColor: 'rgba(255, 255, 255, 0.9)',
+        titleColor: '#1f2937', // text-gray-800
+        bodyColor: '#374151', // text-gray-700
+        borderColor: '#e5e7eb', // border-gray-200
+        borderWidth: 1,
+        padding: 12,
+        boxPadding: 6,
+        usePointStyle: true,
+        callbacks: {
+          label: function(context) {
+            return `Balance: €${context.raw}`;
+          }
+        },
+        bodyFont: {
+          family: "'Inter', sans-serif"
+        },
+        titleFont: {
+          family: "'Inter', sans-serif",
+          weight: 'bold'
+        }
+      },
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        grid: {
+          color: 'rgba(229, 231, 235, 0.5)', // gray-200 with opacity
+        },
+        ticks: {
+          font: {
+            family: "'Inter', sans-serif"
+          },
+          color: '#6b7280', // text-gray-500
+          callback: (value) => `€${value}`
+        }
+      },
+      x: {
+        grid: {
+          display: false
+        },
+        ticks: {
+          font: {
+            family: "'Inter', sans-serif"
+          },
+          color: '#6b7280' // text-gray-500
+        }
+      }
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between">
+        <h1 className="text-2xl font-bold text-gray-900">Financial Dashboard</h1>
+        <p className="text-sm text-gray-500 mt-1 md:mt-0">
+          {format(new Date(), 'EEEE, MMMM d, yyyy')}
+        </p>
+      </div>
+      
+      {/* Summary Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <StatsCard 
+          title="Current Balance"
+          value={`€${balance.toFixed(2)}`}
+          variant={balance >= 0 ? "primary" : "danger"}
+          icon={
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
+            </svg>
+          }
+        />
+        
+        <StatsCard 
+          title="Total Income"
+          value={`€${income.toFixed(2)}`}
+          variant="success"
+          icon={
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+            </svg>
+          }
+        />
+        
+        <StatsCard 
+          title="Total Expenses"
+          value={`€${expenses.toFixed(2)}`}
+          variant="danger"
+          icon={
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4"></path>
+            </svg>
+          }
+        />
+        
+        <StatsCard 
+          title="Savings Rate"
+          value={income > 0 ? `${Math.round((income - expenses) / income * 100)}%` : '0%'}
+          variant="warning"
+          icon={
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+            </svg>
+          }
+        />
+      </div>
+      
+      {/* Charts Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <ChartCard 
+          title="Balance Trend"
+          chart={
+            <div className="h-80">
+              <Line data={balanceChartData} options={balanceChartOptions} />
+            </div>
+          }
+        />
+        
+        <ChartCard 
+          title="Income vs Expenses"
+          chart={
+            <div className="h-80">
+              <Bar data={comparisonChartData} options={comparisonChartOptions} />
+            </div>
+          }
+        />
+      </div>
+      
+      {/* Transactions & Goals Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Recent Transactions */}
+        <Card>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold text-gray-700">Recent Transactions</h2>
+            <div className="flex space-x-2">
+              <Link to="/income">
+                <Button variant="tertiary" size="sm">View All</Button>
+              </Link>
+            </div>
+          </div>
+          
+          <TransactionList 
+            transactions={recentTransactions}
+          />
+        </Card>
+        
+        {/* Financial Goals Summary */}
+        <Card>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold text-gray-700">Financial Goals</h2>
+            <div className="flex space-x-2">
+              <Link to="/goals">
+                <Button variant="tertiary" size="sm">Manage Goals</Button>
+              </Link>
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-2 gap-4 mb-4">
+            <div className="bg-primary-50 p-4 rounded-lg">
+              <p className="text-sm font-medium text-gray-500">Total Goals</p>
+              <p className="text-xl font-bold text-primary-700">{goalStats.total || 0}</p>
+            </div>
+            
+            <div className="bg-success-50 p-4 rounded-lg">
+              <p className="text-sm font-medium text-gray-500">Completed</p>
+              <p className="text-xl font-bold text-success-700">{goalStats.completed || 0}</p>
+            </div>
+          </div>
+          
+          {/* Progress of active goals would go here */}
+          <div className="space-y-4">
+            <div>
+              <div className="flex justify-between mb-1">
+                <h3 className="text-sm font-medium text-gray-700">Overall Progress</h3>
+                <span className="text-sm font-medium text-gray-500">
+                  {goalStats.averageProgress ? goalStats.averageProgress.toFixed(0) : 0}%
+                </span>
+              </div>
+              <ProgressBar 
+                progress={goalStats.averageProgress || 0} 
+                variant="primary"
+                size="md"
+              />
+            </div>
+          </div>
+        </Card>
+      </div>
+      
+      {/* Investments Summary */}
+      <Card>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-semibold text-gray-700">Investments</h2>
+          <div className="flex space-x-2">
+            <Link to="/investments">
+              <Button variant="tertiary" size="sm">View Details</Button>
+            </Link>
+          </div>
+        </div>
+        
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="bg-gray-50 p-4 rounded-lg">
+            <p className="text-sm font-medium text-gray-500">Total Invested</p>
+            <p className="text-xl font-bold text-gray-700">
+              €{investmentStats.totalInvested ? investmentStats.totalInvested.toFixed(2) : '0.00'}
+            </p>
+          </div>
+          
+          <div className="bg-primary-50 p-4 rounded-lg">
+            <p className="text-sm font-medium text-gray-500">Current Value</p>
+            <p className="text-xl font-bold text-primary-700">
+              €{investmentStats.currentValue ? investmentStats.currentValue.toFixed(2) : '0.00'}
+            </p>
+          </div>
+          
+          <div className="bg-success-50 p-4 rounded-lg">
+            <p className="text-sm font-medium text-gray-500">Total Return</p>
+            <p className="text-xl font-bold text-success-700">
+              €{investmentStats.totalReturn ? investmentStats.totalReturn.toFixed(2) : '0.00'}
+            </p>
+          </div>
+          
+          <div className="bg-warning-50 p-4 rounded-lg">
+            <p className="text-sm font-medium text-gray-500">Return Rate</p>
+            <p className="text-xl font-bold text-warning-700">
+              {investmentStats.returnRate ? investmentStats.returnRate.toFixed(2) : '0.00'}%
+            </p>
+          </div>
+        </div>
+      </Card>
+    </div>
+  );
+};
+
+export default Dashboard; 
