@@ -2,12 +2,14 @@
  * Storage Service for managing localStorage operations
  */
 
-// Storage keys
-const KEYS = {
+// Keys para el almacenamiento local
+export const KEYS = {
   TRANSACTIONS: 'zave_transactions',
-  INVESTMENTS: 'zave_investments',
+  CATEGORIES: 'zave_categories',
   GOALS: 'zave_goals',
-  SETTINGS: 'zave_settings'
+  INVESTMENTS: 'zave_investments',
+  AUTOMATED_TRANSACTIONS: 'zave_automated_transactions',
+  USER_SETTINGS: 'zave_settings'
 };
 
 /**
@@ -16,12 +18,12 @@ const KEYS = {
  * @param {any} defaultValue - Default value if key doesn't exist
  * @returns {any} Parsed data from localStorage
  */
-const getData = (key, defaultValue = null) => {
+export const getData = (key, defaultValue = null) => {
   try {
     const data = localStorage.getItem(key);
     return data ? JSON.parse(data) : defaultValue;
   } catch (error) {
-    console.error(`Error retrieving data for key ${key}:`, error);
+    console.error('Error retrieving data:', error);
     return defaultValue;
   }
 };
@@ -32,12 +34,12 @@ const getData = (key, defaultValue = null) => {
  * @param {any} data - Data to serialize and save
  * @returns {boolean} Success status
  */
-const saveData = (key, data) => {
+export const saveData = (key, data) => {
   try {
     localStorage.setItem(key, JSON.stringify(data));
     return true;
   } catch (error) {
-    console.error(`Error saving data for key ${key}:`, error);
+    console.error('Error saving data:', error);
     return false;
   }
 };
@@ -45,7 +47,7 @@ const saveData = (key, data) => {
 /**
  * Initialize all storage with default values if not present
  */
-const initializeStorage = () => {
+export const initializeStorage = () => {
   if (!getData(KEYS.TRANSACTIONS)) {
     saveData(KEYS.TRANSACTIONS, []);
   }
@@ -58,21 +60,37 @@ const initializeStorage = () => {
     saveData(KEYS.GOALS, []);
   }
   
-  if (!getData(KEYS.SETTINGS)) {
-    saveData(KEYS.SETTINGS, {
+  if (!getData(KEYS.AUTOMATED_TRANSACTIONS)) {
+    saveData(KEYS.AUTOMATED_TRANSACTIONS, []);
+  }
+  
+  if (!getData(KEYS.USER_SETTINGS)) {
+    saveData(KEYS.USER_SETTINGS, {
       currency: '€',
       theme: 'light',
-      categories: {
-        income: ['Salary', 'Investments', 'Gifts', 'Other'],
-        expense: ['Food', 'Housing', 'Transportation', 'Entertainment', 'Healthcare', 'Other']
-      }
+      locale: 'es-ES'
     });
   }
 };
 
-export {
-  KEYS,
-  getData,
-  saveData,
-  initializeStorage
+// Eliminar datos de localStorage
+export const removeData = (key) => {
+  try {
+    localStorage.removeItem(key);
+    return true;
+  } catch (error) {
+    console.error('Error removing data:', error);
+    return false;
+  }
+};
+
+// Limpiar todos los datos de localStorage
+export const clearAllData = () => {
+  try {
+    Object.values(KEYS).forEach(key => localStorage.removeItem(key));
+    return true;
+  } catch (error) {
+    console.error('Error clearing all data:', error);
+    return false;
+  }
 }; 

@@ -20,7 +20,7 @@ const Button = ({
   ...rest
 }) => {
   // Base classes for all buttons
-  const baseClasses = 'inline-flex items-center justify-center font-medium transition-colors rounded focus:outline-none focus:ring-2 focus:ring-offset-2';
+  const baseClasses = 'inline-flex items-center justify-center font-medium transition-colors rounded focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-gray-800';
   
   // Size-specific classes
   const sizeClasses = {
@@ -31,12 +31,12 @@ const Button = ({
   
   // Variant-specific classes
   const variantClasses = {
-    primary: 'bg-primary-500 text-white hover:bg-primary-600 focus:ring-primary-500 disabled:bg-primary-300',
-    secondary: 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 focus:ring-primary-500 disabled:bg-gray-100 disabled:text-gray-400',
-    tertiary: 'bg-transparent text-primary-500 hover:bg-primary-50 focus:ring-primary-500 disabled:text-primary-300',
-    success: 'bg-success-500 text-white hover:bg-success-600 focus:ring-success-500 disabled:bg-success-300',
-    warning: 'bg-warning-500 text-white hover:bg-warning-600 focus:ring-warning-500 disabled:bg-warning-300',
-    danger: 'bg-danger-500 text-white hover:bg-danger-600 focus:ring-danger-500 disabled:bg-danger-300',
+    primary: 'bg-primary-500 text-white hover:bg-primary-600 focus:ring-primary-500 disabled:bg-primary-300 dark:disabled:bg-primary-800',
+    secondary: 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 focus:ring-primary-500 disabled:bg-gray-100 disabled:text-gray-400 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600 dark:hover:bg-gray-600 dark:disabled:bg-gray-800 dark:disabled:text-gray-500',
+    tertiary: 'bg-transparent text-primary-500 hover:bg-primary-50 focus:ring-primary-500 disabled:text-primary-300 dark:text-primary-400 dark:hover:bg-gray-700 dark:hover:text-primary-300 dark:disabled:text-primary-700',
+    success: 'bg-success-500 text-white hover:bg-success-600 focus:ring-success-500 disabled:bg-success-300 dark:disabled:bg-success-800',
+    warning: 'bg-warning-500 text-white hover:bg-warning-600 focus:ring-warning-500 disabled:bg-warning-300 dark:disabled:bg-warning-800',
+    danger: 'bg-danger-500 text-white hover:bg-danger-600 focus:ring-danger-500 disabled:bg-danger-300 dark:disabled:bg-danger-800',
   };
   
   // Combined classes

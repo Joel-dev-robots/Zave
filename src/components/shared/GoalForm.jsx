@@ -73,7 +73,7 @@ const GoalForm = ({
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+        <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
           Goal Name
         </label>
         <input
@@ -82,21 +82,21 @@ const GoalForm = ({
           id="name"
           value={formData.name}
           onChange={handleChange}
-          className={`focus:ring-purple-500 focus:border-purple-500 block w-full sm:text-sm border-gray-300 rounded-md ${
-            errors.name ? 'border-red-300' : ''
+          className={`focus:ring-purple-500 focus:border-purple-500 block w-full sm:text-sm border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white ${
+            errors.name ? 'border-red-300 dark:border-red-500' : ''
           }`}
           placeholder="e.g. Buy a Car, Down Payment, Emergency Fund"
         />
-        {errors.name && <p className="mt-1 text-sm text-red-600">{errors.name}</p>}
+        {errors.name && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.name}</p>}
       </div>
       
       <div>
-        <label htmlFor="targetAmount" className="block text-sm font-medium text-gray-700 mb-1">
+        <label htmlFor="targetAmount" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
           Target Amount
         </label>
         <div className="relative rounded-md shadow-sm">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <span className="text-gray-500 sm:text-sm">€</span>
+            <span className="text-gray-500 dark:text-gray-400 sm:text-sm">€</span>
           </div>
           <input
             type="number"
@@ -106,17 +106,17 @@ const GoalForm = ({
             step="0.01"
             value={formData.targetAmount}
             onChange={handleChange}
-            className={`focus:ring-purple-500 focus:border-purple-500 block w-full pl-7 pr-12 sm:text-sm border-gray-300 rounded-md ${
-              errors.targetAmount ? 'border-red-300' : ''
+            className={`focus:ring-purple-500 focus:border-purple-500 block w-full pl-7 pr-12 sm:text-sm border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white ${
+              errors.targetAmount ? 'border-red-300 dark:border-red-500' : ''
             }`}
             placeholder="0.00"
           />
         </div>
-        {errors.targetAmount && <p className="mt-1 text-sm text-red-600">{errors.targetAmount}</p>}
+        {errors.targetAmount && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.targetAmount}</p>}
       </div>
       
       <div>
-        <label htmlFor="deadline" className="block text-sm font-medium text-gray-700 mb-1">
+        <label htmlFor="deadline" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
           Target Date
         </label>
         <input
@@ -125,15 +125,15 @@ const GoalForm = ({
           id="deadline"
           value={formData.deadline}
           onChange={handleChange}
-          className={`focus:ring-purple-500 focus:border-purple-500 block w-full sm:text-sm border-gray-300 rounded-md ${
-            errors.deadline ? 'border-red-300' : ''
+          className={`focus:ring-purple-500 focus:border-purple-500 block w-full sm:text-sm border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white ${
+            errors.deadline ? 'border-red-300 dark:border-red-500' : ''
           }`}
         />
-        {errors.deadline && <p className="mt-1 text-sm text-red-600">{errors.deadline}</p>}
+        {errors.deadline && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.deadline}</p>}
       </div>
       
       <div>
-        <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
+        <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
           Description (Optional)
         </label>
         <textarea
@@ -142,7 +142,7 @@ const GoalForm = ({
           rows="3"
           value={formData.description}
           onChange={handleChange}
-          className="shadow-sm focus:ring-purple-500 focus:border-purple-500 block w-full sm:text-sm border-gray-300 rounded-md"
+          className="shadow-sm focus:ring-purple-500 focus:border-purple-500 block w-full sm:text-sm border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
           placeholder="Additional details about your goal"
         ></textarea>
       </div>
@@ -150,7 +150,7 @@ const GoalForm = ({
       <div className="pt-2">
         <button
           type="submit"
-          className="w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+          className="w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 dark:bg-purple-700 dark:hover:bg-purple-800 dark:focus:ring-offset-gray-800"
         >
           {buttonText}
         </button>

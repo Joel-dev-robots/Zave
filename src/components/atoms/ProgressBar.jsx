@@ -38,7 +38,7 @@ const ProgressBar = ({
   return (
     <div className={`relative w-full ${className}`} {...rest}>
       {/* Background */}
-      <div className={`w-full bg-gray-200 rounded-full overflow-hidden ${sizeClasses[size]}`}>
+      <div className={`w-full bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden ${sizeClasses[size]}`}>
         {/* Foreground */}
         <div 
           className={`${variantClasses[variant]} rounded-full transition-all duration-500 ease-out ${sizeClasses[size]}`}
@@ -48,7 +48,7 @@ const ProgressBar = ({
       
       {/* Percentage text */}
       {showPercentage && (
-        <div className="text-xs font-medium text-gray-500 mt-1">
+        <div className="text-xs font-medium text-gray-500 dark:text-gray-400 mt-1">
           {normalizedProgress.toFixed(0)}%
         </div>
       )}

@@ -15,11 +15,11 @@ const Card = ({
 }) => {
   // Variant-specific classes
   const variantClasses = {
-    default: 'bg-white border border-gray-200',
-    primary: 'bg-primary-50 border border-primary-200',
-    success: 'bg-success-50 border border-success-200',
-    warning: 'bg-warning-50 border border-warning-200',
-    danger: 'bg-danger-50 border border-danger-200',
+    default: 'bg-white border border-gray-200 dark:bg-gray-800 dark:border-gray-700',
+    primary: 'bg-primary-50 border border-primary-200 dark:bg-primary-900/30 dark:border-primary-800/50',
+    success: 'bg-success-50 border border-success-200 dark:bg-success-900/30 dark:border-success-800/50',
+    warning: 'bg-warning-50 border border-warning-200 dark:bg-warning-900/30 dark:border-warning-800/50',
+    danger: 'bg-danger-50 border border-danger-200 dark:bg-danger-900/30 dark:border-danger-800/50',
   };
   
   // Combined classes

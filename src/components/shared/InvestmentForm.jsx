@@ -76,7 +76,7 @@ const InvestmentForm = ({
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+        <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
           Investment Name
         </label>
         <input
@@ -85,21 +85,21 @@ const InvestmentForm = ({
           id="name"
           value={formData.name}
           onChange={handleChange}
-          className={`focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md ${
-            errors.name ? 'border-red-300' : ''
+          className={`focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white ${
+            errors.name ? 'border-red-300 dark:border-red-500' : ''
           }`}
           placeholder="e.g. Stock, ETF, Real Estate"
         />
-        {errors.name && <p className="mt-1 text-sm text-red-600">{errors.name}</p>}
+        {errors.name && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.name}</p>}
       </div>
       
       <div>
-        <label htmlFor="initialAmount" className="block text-sm font-medium text-gray-700 mb-1">
+        <label htmlFor="initialAmount" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
           Initial Amount
         </label>
         <div className="relative rounded-md shadow-sm">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <span className="text-gray-500 sm:text-sm">€</span>
+            <span className="text-gray-500 dark:text-gray-400 sm:text-sm">€</span>
           </div>
           <input
             type="number"
@@ -109,17 +109,17 @@ const InvestmentForm = ({
             step="0.01"
             value={formData.initialAmount}
             onChange={handleChange}
-            className={`focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-7 pr-12 sm:text-sm border-gray-300 rounded-md ${
-              errors.initialAmount ? 'border-red-300' : ''
+            className={`focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-7 pr-12 sm:text-sm border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white ${
+              errors.initialAmount ? 'border-red-300 dark:border-red-500' : ''
             }`}
             placeholder="0.00"
           />
         </div>
-        {errors.initialAmount && <p className="mt-1 text-sm text-red-600">{errors.initialAmount}</p>}
+        {errors.initialAmount && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.initialAmount}</p>}
       </div>
       
       <div>
-        <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-1">
+        <label htmlFor="category" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
           Category
         </label>
         <select
@@ -127,8 +127,8 @@ const InvestmentForm = ({
           name="category"
           value={formData.category}
           onChange={handleChange}
-          className={`mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm ${
-            errors.category ? 'border-red-300' : ''
+          className={`mt-1 block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white ${
+            errors.category ? 'border-red-300 dark:border-red-500' : ''
           }`}
         >
           <option value="">Select a category</option>
@@ -140,11 +140,11 @@ const InvestmentForm = ({
           <option value="Mutual Funds">Mutual Funds</option>
           <option value="Other">Other</option>
         </select>
-        {errors.category && <p className="mt-1 text-sm text-red-600">{errors.category}</p>}
+        {errors.category && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.category}</p>}
       </div>
       
       <div>
-        <label htmlFor="expectedReturn" className="block text-sm font-medium text-gray-700 mb-1">
+        <label htmlFor="expectedReturn" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
           Expected Annual Return (%)
         </label>
         <div className="relative rounded-md shadow-sm">
@@ -156,20 +156,20 @@ const InvestmentForm = ({
             step="0.1"
             value={formData.expectedReturn}
             onChange={handleChange}
-            className={`focus:ring-indigo-500 focus:border-indigo-500 block w-full pr-8 sm:text-sm border-gray-300 rounded-md ${
-              errors.expectedReturn ? 'border-red-300' : ''
+            className={`focus:ring-indigo-500 focus:border-indigo-500 block w-full pr-8 sm:text-sm border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white ${
+              errors.expectedReturn ? 'border-red-300 dark:border-red-500' : ''
             }`}
             placeholder="0.0"
           />
           <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-            <span className="text-gray-500 sm:text-sm">%</span>
+            <span className="text-gray-500 dark:text-gray-400 sm:text-sm">%</span>
           </div>
         </div>
-        {errors.expectedReturn && <p className="mt-1 text-sm text-red-600">{errors.expectedReturn}</p>}
+        {errors.expectedReturn && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.expectedReturn}</p>}
       </div>
       
       <div>
-        <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
+        <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
           Description (Optional)
         </label>
         <textarea
@@ -178,13 +178,13 @@ const InvestmentForm = ({
           rows="3"
           value={formData.description}
           onChange={handleChange}
-          className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+          className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
           placeholder="Additional notes about this investment"
         ></textarea>
       </div>
       
       <div>
-        <label htmlFor="date" className="block text-sm font-medium text-gray-700 mb-1">
+        <label htmlFor="date" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
           Investment Date
         </label>
         <input
@@ -193,17 +193,17 @@ const InvestmentForm = ({
           id="date"
           value={formData.date}
           onChange={handleChange}
-          className={`focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md ${
-            errors.date ? 'border-red-300' : ''
+          className={`focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white ${
+            errors.date ? 'border-red-300 dark:border-red-500' : ''
           }`}
         />
-        {errors.date && <p className="mt-1 text-sm text-red-600">{errors.date}</p>}
+        {errors.date && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.date}</p>}
       </div>
       
       <div className="pt-2">
         <button
           type="submit"
-          className="w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+          className="w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:bg-indigo-700 dark:hover:bg-indigo-800 dark:focus:ring-offset-gray-800"
         >
           {buttonText}
         </button>

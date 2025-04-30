@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { format } from 'date-fns';
 
 const TransactionList = ({
   transactions = [],
@@ -11,7 +10,7 @@ const TransactionList = ({
   
   if (transactions.length === 0) {
     return (
-      <div className="text-center py-8 text-slate-500 bg-white rounded-lg shadow">
+      <div className="text-center py-8 text-slate-500 bg-white rounded-lg shadow dark:bg-gray-800">
         {emptyMessage}
       </div>
     );
@@ -22,33 +21,37 @@ const TransactionList = ({
   };
   
   return (
-    <div className="bg-white rounded-lg shadow overflow-hidden">
-      <div className="divide-y divide-gray-200">
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
+      <div className="divide-y divide-gray-200 dark:divide-gray-700">
         {transactions.map((transaction) => (
           <div key={transaction.id} className="transition">
             <div 
-              className={`p-4 cursor-pointer hover:bg-gray-50 ${
-                transaction.type === 'income' ? 'hover:bg-green-50' : 'hover:bg-red-50'
+              className={`p-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 ${
+                transaction.type === 'income' 
+                  ? 'hover:bg-green-50 dark:hover:bg-green-900/20' 
+                  : 'hover:bg-red-50 dark:hover:bg-red-900/20'
               }`}
               onClick={() => toggleExpand(transaction.id)}
             >
               <div className="flex justify-between items-center">
                 <div>
-                  <h3 className="text-sm md:text-base font-medium text-gray-900">
+                  <h3 className="text-sm md:text-base font-medium text-gray-900 dark:text-gray-100">
                     {transaction.description}
                   </h3>
-                  <p className="text-xs text-gray-500 mt-1">
-                    {format(new Date(transaction.date), 'MMM dd, yyyy')} · {transaction.category}
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    {transaction.category}
                   </p>
                 </div>
                 <div className="flex items-center">
                   <span className={`text-sm md:text-base font-semibold ${
-                    transaction.type === 'income' ? 'text-green-600' : 'text-red-600'
+                    transaction.type === 'income' 
+                      ? 'text-green-600 dark:text-green-400' 
+                      : 'text-red-600 dark:text-red-400'
                   }`}>
                     {transaction.type === 'income' ? '+' : '-'}€{Number(transaction.amount).toFixed(2)}
                   </span>
                   <svg 
-                    className={`ml-2 h-5 w-5 text-gray-400 transform transition-transform ${
+                    className={`ml-2 h-5 w-5 text-gray-400 dark:text-gray-500 transform transition-transform ${
                       expandedId === transaction.id ? 'rotate-180' : ''
                     }`} 
                     xmlns="http://www.w3.org/2000/svg" 
@@ -66,22 +69,16 @@ const TransactionList = ({
             </div>
             
             {expandedId === transaction.id && (
-              <div className={`p-4 border-t ${
-                transaction.type === 'income' ? 'bg-green-50' : 'bg-red-50'
+              <div className={`p-4 border-t dark:border-gray-700 ${
+                transaction.type === 'income' 
+                  ? 'bg-green-50 dark:bg-green-900/20' 
+                  : 'bg-red-50 dark:bg-red-900/20'
               }`}>
                 <div className="flex flex-wrap justify-between mb-4">
                   <div className="w-full sm:w-auto mb-2 sm:mb-0">
-                    <span className="text-xs text-gray-500">ID:</span>
-                    <span className="text-xs ml-1">{transaction.id.substring(0, 8)}...</span>
+                    <span className="text-xs text-gray-500 dark:text-gray-400">ID:</span>
+                    <span className="text-xs ml-1 dark:text-gray-300">{transaction.id.substring(0, 8)}...</span>
                   </div>
-                  {transaction.updatedAt && (
-                    <div>
-                      <span className="text-xs text-gray-500">Last updated:</span>
-                      <span className="text-xs ml-1">
-                        {format(new Date(transaction.updatedAt), 'MMM dd, yyyy HH:mm')}
-                      </span>
-                    </div>
-                  )}
                 </div>
                 
                 <div className="flex space-x-3">
@@ -91,7 +88,7 @@ const TransactionList = ({
                       e.stopPropagation();
                       onEdit(transaction);
                     }}
-                    className="py-1 px-3 bg-blue-100 hover:bg-blue-200 text-blue-700 text-sm rounded-md"
+                    className="py-1 px-3 bg-blue-100 hover:bg-blue-200 text-blue-700 text-sm rounded-md dark:bg-blue-900/40 dark:hover:bg-blue-800/60 dark:text-blue-300"
                   >
                     Edit
                   </button>
@@ -103,7 +100,7 @@ const TransactionList = ({
                         onDelete(transaction.id);
                       }
                     }}
-                    className="py-1 px-3 bg-red-100 hover:bg-red-200 text-red-700 text-sm rounded-md"
+                    className="py-1 px-3 bg-red-100 hover:bg-red-200 text-red-700 text-sm rounded-md dark:bg-red-900/40 dark:hover:bg-red-800/60 dark:text-red-300"
                   >
                     Delete
                   </button>

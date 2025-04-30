@@ -60,6 +60,16 @@ const Sidebar = () => {
       )
     },
     { 
+      path: '/automated', 
+      label: 'Automate', 
+      icon: (
+        <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <polyline points="12 6 12 12 16 14"></polyline>
+        </svg>
+      )
+    },
+    { 
       path: '/investments', 
       label: 'Investments', 
       icon: (
@@ -136,7 +146,7 @@ const Sidebar = () => {
           {/* Botón para contraer/expandir sidebar */}
           <li className="mt-8">
             <button 
-              className={`flex items-center w-full ${isCollapsed ? 'justify-center' : 'px-5'} py-4 text-base font-medium rounded-lg transition-colors text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700`}
+              className={`flex items-center w-full ${isCollapsed ? 'justify-center' : 'px-5'} py-4 text-base font-medium rounded-lg transition-colors border border-gray-300 dark:border-gray-600 bg-white text-gray-700 hover:bg-gray-50 hover:text-primary-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600 dark:hover:text-primary-300`}
               onClick={toggleCollapse}
               aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
               title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
