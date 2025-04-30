@@ -313,7 +313,7 @@ const AutomatedTransactions = () => {
       ) : (
         <div className="space-y-4">
           {filteredTransactions().map((transaction) => {
-            const isActive = transaction.isActive;
+            const isActive = transaction.active;
             const typeColor = transaction.type === 'income' 
               ? 'text-green-600 dark:text-green-400' 
               : 'text-red-600 dark:text-red-400';
@@ -339,7 +339,7 @@ const AutomatedTransactions = () => {
                     </div>
                     <div className="mt-1 flex items-center">
                       <span className={`text-lg font-semibold ${typeColor}`}>
-                        {transaction.type === 'income' ? '+' : '-'}€{transaction.amount.toFixed(2)}
+                        {transaction.type === 'income' ? '+' : '-'}€{typeof transaction.amount === 'number' ? transaction.amount.toFixed(2) : parseFloat(transaction.amount).toFixed(2)}
                       </span>
                       <span className="ml-2 text-sm text-gray-500 dark:text-gray-400">
                         {isActive ? 'Active' : 'Inactive'}

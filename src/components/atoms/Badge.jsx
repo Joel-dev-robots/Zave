@@ -24,14 +24,14 @@ const Badge = ({
     md: 'px-2.5 py-0.5 text-sm',
   };
   
-  // Variant-specific classes
+  // Variant-specific classes (usando las clases disponibles en Tailwind)
   const variantClasses = {
-    primary: 'bg-primary-100 text-primary-800',
-    success: 'bg-success-100 text-success-800',
-    warning: 'bg-warning-100 text-warning-800',
-    danger: 'bg-danger-100 text-danger-800',
-    info: 'bg-blue-100 text-blue-800',
-    gray: 'bg-gray-100 text-gray-800',
+    primary: 'bg-primary-100 text-primary-800 dark:bg-primary-900/30 dark:text-primary-300',
+    success: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300',
+    warning: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300',
+    danger: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300',
+    info: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300',
+    gray: 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300',
   };
   
   // Combined classes

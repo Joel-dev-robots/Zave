@@ -1,6 +1,6 @@
 import { getData, saveData, KEYS } from './storageService';
 import { addTransaction } from './transactionService';
-import { format, addDays, addWeeks, addMonths, addYears, isBefore, isAfter } from 'date-fns';
+import { addDays, addWeeks, addMonths, addYears, isBefore } from 'date-fns';
 
 // Constantes de frecuencia
 export const FREQUENCY = {

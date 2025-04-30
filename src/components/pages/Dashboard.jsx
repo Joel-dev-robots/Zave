@@ -408,7 +408,7 @@ const Dashboard = () => {
                       ? 'text-success-600 dark:text-success-400' 
                       : 'text-danger-600 dark:text-danger-400'
                   }`}>
-                    {transaction.type === 'income' ? '+' : '-'}€{transaction.amount.toFixed(2)}
+                    {transaction.type === 'income' ? '+' : '-'}€{typeof transaction.amount === 'number' ? transaction.amount.toFixed(2) : parseFloat(transaction.amount).toFixed(2)}
                   </span>
                 </div>
               </div>
