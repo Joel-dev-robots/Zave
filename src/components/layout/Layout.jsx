@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
 import Sidebar from './Sidebar';
+import Header from './Header';
 
 const Layout = () => {
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
@@ -64,6 +65,9 @@ const Layout = () => {
       
       {/* Main content area */}
       <div className={`flex flex-col flex-1 ml-0 lg:${isSidebarCollapsed ? 'ml-20' : 'ml-72'} transition-all duration-300`}>
+        {/* Mobile Header */}
+        <Header />
+        
         <main className="flex-1 p-5 md:p-6 lg:p-8 overflow-auto dark:bg-gray-900">
           <div className="max-w-7xl mx-auto">
             <Outlet />
