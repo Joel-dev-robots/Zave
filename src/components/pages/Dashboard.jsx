@@ -73,7 +73,7 @@ const Dashboard = () => {
     
     // Cargar automatizaciones
     setAutomatedTransactions(getAllAutomatedTransactions().filter(at => at.active));
-
+    
     // Get recent transactions
     const allTransactions = getData(KEYS.TRANSACTIONS, []);
     const sorted = [...allTransactions]

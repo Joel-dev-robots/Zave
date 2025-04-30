@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
 import Sidebar from './Sidebar';
-import Header from './Header';
 
 const Layout = () => {
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
@@ -18,6 +17,14 @@ const Layout = () => {
       document.documentElement.classList.remove('dark-mode');
       document.body.classList.remove('dark-mode');
     }
+  };
+
+  const toggleMobileSidebar = () => {
+    const newState = !isMobileSidebarOpen;
+    setIsMobileSidebarOpen(newState);
+    window.dispatchEvent(new CustomEvent('toggle-mobile-sidebar', { 
+      detail: { isOpen: newState }
+    }));
   };
 
   useEffect(() => {
@@ -59,14 +66,20 @@ const Layout = () => {
       {isMobileSidebarOpen && (
         <div 
           className="fixed inset-0 bg-gray-900 bg-opacity-50 z-20 lg:hidden dark:bg-opacity-70"
-          onClick={() => setIsMobileSidebarOpen(false)}
+          onClick={toggleMobileSidebar}
         ></div>
       )}
       
       {/* Main content area */}
       <div className={`flex flex-col flex-1 ml-0 lg:${isSidebarCollapsed ? 'ml-20' : 'ml-72'} transition-all duration-300`}>
-        {/* Mobile Header */}
-        <Header />
+        {/* Mobile Menu Button with Z - positioned where X used to be */}
+        <button 
+          className="fixed top-7 right-6 p-2 z-40 rounded-full bg-primary-500 shadow-lg lg:hidden flex flex-col items-center justify-center text-white dark:bg-primary-700"
+          onClick={toggleMobileSidebar}
+          aria-label={isMobileSidebarOpen ? "Close menu" : "Open menu"}
+        >
+          <span className="text-xl font-bold">Z</span>
+        </button>
         
         <main className="flex-1 p-5 md:p-6 lg:p-8 overflow-auto dark:bg-gray-900">
           <div className="max-w-7xl mx-auto">
