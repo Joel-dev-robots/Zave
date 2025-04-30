@@ -15,26 +15,33 @@ import NotFound from './components/pages/NotFound';
 
 // Servicios
 import { initializeStorage } from './services/storageService';
+import { initializeSettings } from './services/settingsService';
 import { processAutomatedTransactions } from './services/automationService';
 
 function App() {
-  // Inicializar almacenamiento y procesar automatizaciones al cargar
+  // Inicializar almacenamiento y configuraciones al cargar
   useEffect(() => {
     initializeStorage();
+    initializeSettings(); // Inicializar las categorías y configuraciones
     
-    // Procesar transacciones automáticas pendientes
-    const processedTransactions = processAutomatedTransactions();
-    if (processedTransactions.length > 0) {
-      console.log(`Procesadas ${processedTransactions.length} transacciones automáticas`);
+    // Verificar transacciones automáticas una vez al día
+    // Solo comprobamos una vez al día para no procesar múltiples veces
+    const lastProcessed = localStorage.getItem('last_auto_processed');
+    const today = new Date().toDateString();
+    
+    if (!lastProcessed || lastProcessed !== today) {
+      // Procesar transacciones automáticas pendientes
+      const processedTransactions = processAutomatedTransactions();
+      if (processedTransactions.length > 0) {
+        console.log(`Procesadas ${processedTransactions.length} transacciones automáticas`);
+      }
+      
+      // Guardar la fecha de último procesamiento
+      localStorage.setItem('last_auto_processed', today);
     }
     
-    // Configurar procesamiento diario de automatizaciones
-    const checkInterval = 1000 * 60 * 60; // Cada hora
-    const intervalId = setInterval(() => {
-      processAutomatedTransactions();
-    }, checkInterval);
-    
-    return () => clearInterval(intervalId);
+    // No configuramos un intervalo para no crear bucles infinitos
+    // Las automatizaciones se verificarán cada vez que el usuario cargue la aplicación
   }, []);
 
   return (

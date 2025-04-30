@@ -22,6 +22,8 @@ const AutomatedTransactions = () => {
     amount: '',
     type: 'income',
     category: '',
+    frequency: FREQUENCY.MONTHLY,
+    startDate: new Date().toISOString().slice(0, 10),
   });
   const [isEditing, setIsEditing] = useState(false);
   const [editId, setEditId] = useState(null);
@@ -71,6 +73,8 @@ const AutomatedTransactions = () => {
       amount: transaction.amount,
       type: transaction.type,
       category: transaction.category,
+      frequency: transaction.frequency || FREQUENCY.MONTHLY,
+      startDate: transaction.startDate || new Date().toISOString().slice(0, 10),
     });
     
     setIsEditing(true);
@@ -96,6 +100,8 @@ const AutomatedTransactions = () => {
       amount: '',
       type: 'income',
       category: '',
+      frequency: FREQUENCY.MONTHLY,
+      startDate: new Date().toISOString().slice(0, 10),
     });
     setIsEditing(false);
     setEditId(null);
@@ -216,6 +222,40 @@ const AutomatedTransactions = () => {
                 onChange={handleInputChange}
                 className="focus:ring-purple-500 focus:border-purple-500 block w-full sm:text-sm border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                 placeholder="Ex: Salary, Entertainment, etc."
+              />
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Frequency
+              </label>
+              <select
+                name="frequency"
+                value={formData.frequency}
+                onChange={handleInputChange}
+                required
+                className="focus:ring-purple-500 focus:border-purple-500 block w-full sm:text-sm border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+              >
+                <option value={FREQUENCY.DAILY}>Daily</option>
+                <option value={FREQUENCY.WEEKLY}>Weekly</option>
+                <option value={FREQUENCY.BIWEEKLY}>Biweekly</option>
+                <option value={FREQUENCY.MONTHLY}>Monthly</option>
+                <option value={FREQUENCY.QUARTERLY}>Quarterly</option>
+                <option value={FREQUENCY.YEARLY}>Yearly</option>
+              </select>
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Start Date
+              </label>
+              <input
+                type="date"
+                name="startDate"
+                value={formData.startDate}
+                onChange={handleInputChange}
+                required
+                className="focus:ring-purple-500 focus:border-purple-500 block w-full sm:text-sm border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
               />
             </div>
             

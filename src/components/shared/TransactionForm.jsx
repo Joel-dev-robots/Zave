@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getData, KEYS } from '../../services/storageService';
+import { getCategories } from '../../services/settingsService';
 
 const TransactionForm = ({ 
   onSubmit, 
@@ -21,11 +21,9 @@ const TransactionForm = ({
   });
   
   useEffect(() => {
-    // Get categories from settings
-    const settings = getData(KEYS.SETTINGS);
-    if (settings?.categories) {
-      setCategories(settings.categories);
-    }
+    // Get categories from settings service
+    const categoriesData = getCategories();
+    setCategories(categoriesData);
   }, []);
   
   const handleChange = (e) => {
