@@ -95,7 +95,7 @@ const Sidebar = () => {
 
   return (
     <aside 
-      className={`fixed inset-y-0 left-0 ${isCollapsed ? 'w-20' : 'w-72'} bg-white border-r border-gray-200 z-30 transition-all duration-300 transform overflow-y-auto dark:bg-gray-800 dark:border-gray-700`}
+      className={`fixed inset-y-0 left-0 ${isCollapsed ? 'w-20' : 'w-72'} bg-white border-r border-gray-200 z-10 transition-all duration-300 transform overflow-y-auto dark:bg-gray-800 dark:border-gray-700`}
     >
       {/* Logo solamente */}
       <div className={`flex items-center justify-between h-20 border-b border-gray-200 dark:border-gray-700 ${isCollapsed ? 'px-4' : 'px-6'}`}>

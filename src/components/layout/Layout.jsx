@@ -71,7 +71,7 @@ const Layout = () => {
       )}
       
       {/* Main content area */}
-      <div className={`flex flex-col flex-1 ml-0 lg:${isSidebarCollapsed ? 'ml-20' : 'ml-72'} transition-all duration-300`}>
+      <div className={`flex flex-col flex-1 ${isSidebarCollapsed ? 'lg:ml-20' : 'lg:ml-72'} transition-all duration-300`}>
         {/* Mobile Menu Button with Z - positioned where X used to be */}
         <button 
           className="fixed top-7 right-6 p-2 z-40 rounded-full bg-primary-500 shadow-lg lg:hidden flex flex-col items-center justify-center text-white dark:bg-primary-700"
@@ -82,7 +82,7 @@ const Layout = () => {
         </button>
         
         <main className="flex-1 p-5 md:p-6 lg:p-8 overflow-auto dark:bg-gray-900">
-          <div className="max-w-7xl mx-auto">
+          <div className="w-full mx-auto">
             <Outlet />
           </div>
         </main>

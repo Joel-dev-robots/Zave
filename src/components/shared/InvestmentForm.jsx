@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import CryptoSearch from './CryptoSearch';
 
 const InvestmentForm = ({
   onSubmit,
@@ -8,12 +9,16 @@ const InvestmentForm = ({
     description: '',
     category: '',
     expectedReturn: '',
-    date: new Date().toISOString().split('T')[0]
+    date: new Date().toISOString().split('T')[0],
+    coinId: '',
+    coinSymbol: '',
+    coinThumb: ''
   },
   buttonText = 'Save Investment'
 }) => {
   const [formData, setFormData] = useState(initialValues);
   const [errors, setErrors] = useState({});
+  const [showCryptoSearch, setShowCryptoSearch] = useState(false);
   
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -58,6 +63,26 @@ const InvestmentForm = ({
     return Object.keys(newErrors).length === 0;
   };
   
+  const handleCryptoSelect = (coin) => {
+    setFormData(prev => ({
+      ...prev,
+      name: coin.name,
+      coinId: coin.id,
+      coinSymbol: coin.symbol.toUpperCase(),
+      coinThumb: coin.thumb || '',
+      category: 'Cryptocurrency'
+    }));
+    
+    // Limpiar errores relacionados
+    if (errors.name || errors.category) {
+      setErrors(prev => ({
+        ...prev,
+        name: null,
+        category: null
+      }));
+    }
+  };
+  
   const handleSubmit = (e) => {
     e.preventDefault();
     
@@ -73,25 +98,67 @@ const InvestmentForm = ({
     }
   };
   
+  // Activar/desactivar buscador de cripto cuando la categoría cambie
+  useEffect(() => {
+    setShowCryptoSearch(formData.category === 'Cryptocurrency');
+  }, [formData.category]);
+  
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-          Investment Name
+        <label htmlFor="category" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+          Category
         </label>
-        <input
-          type="text"
-          name="name"
-          id="name"
-          value={formData.name}
+        <select
+          id="category"
+          name="category"
+          value={formData.category}
           onChange={handleChange}
-          className={`focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white ${
-            errors.name ? 'border-red-300 dark:border-red-500' : ''
+          className={`mt-1 block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white ${
+            errors.category ? 'border-red-300 dark:border-red-500' : ''
           }`}
-          placeholder="e.g. Stock, ETF, Real Estate"
-        />
-        {errors.name && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.name}</p>}
+        >
+          <option value="">Select a category</option>
+          <option value="Stocks">Stocks</option>
+          <option value="Bonds">Bonds</option>
+          <option value="Real Estate">Real Estate</option>
+          <option value="Cryptocurrency">Cryptocurrency</option>
+          <option value="ETF">ETF</option>
+          <option value="Mutual Funds">Mutual Funds</option>
+          <option value="Other">Other</option>
+        </select>
+        {errors.category && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.category}</p>}
       </div>
+      
+      {showCryptoSearch ? (
+        <div>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            Search Cryptocurrency
+          </label>
+          <CryptoSearch onSelect={handleCryptoSelect} />
+          <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+            Search for any cryptocurrency available on CoinGecko
+          </p>
+        </div>
+      ) : (
+        <div>
+          <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            Investment Name
+          </label>
+          <input
+            type="text"
+            name="name"
+            id="name"
+            value={formData.name}
+            onChange={handleChange}
+            className={`focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white ${
+              errors.name ? 'border-red-300 dark:border-red-500' : ''
+            }`}
+            placeholder="e.g. Stock, ETF, Real Estate"
+          />
+          {errors.name && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.name}</p>}
+        </div>
+      )}
       
       <div>
         <label htmlFor="initialAmount" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -116,31 +183,6 @@ const InvestmentForm = ({
           />
         </div>
         {errors.initialAmount && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.initialAmount}</p>}
-      </div>
-      
-      <div>
-        <label htmlFor="category" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-          Category
-        </label>
-        <select
-          id="category"
-          name="category"
-          value={formData.category}
-          onChange={handleChange}
-          className={`mt-1 block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white ${
-            errors.category ? 'border-red-300 dark:border-red-500' : ''
-          }`}
-        >
-          <option value="">Select a category</option>
-          <option value="Stocks">Stocks</option>
-          <option value="Bonds">Bonds</option>
-          <option value="Real Estate">Real Estate</option>
-          <option value="Cryptocurrency">Cryptocurrency</option>
-          <option value="ETF">ETF</option>
-          <option value="Mutual Funds">Mutual Funds</option>
-          <option value="Other">Other</option>
-        </select>
-        {errors.category && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.category}</p>}
       </div>
       
       <div>
