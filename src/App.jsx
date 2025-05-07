@@ -9,6 +9,7 @@ import Dashboard from './components/pages/Dashboard';
 import Income from './components/pages/Income';
 import Expenses from './components/pages/Expenses';
 import Investments from './components/pages/Investments';
+import ChronologicalHistory from './components/pages/ChronologicalHistory';
 import Goals from './components/pages/Goals';
 import AutomatedTransactions from './components/pages/AutomatedTransactions';
 import NotFound from './components/pages/NotFound';
@@ -52,6 +53,7 @@ function App() {
           <Route path="income" element={<Income />} />
           <Route path="expenses" element={<Expenses />} />
           <Route path="investments" element={<Investments />} />
+          <Route path="investments/history" element={<ChronologicalHistory />} />
           <Route path="goals" element={<Goals />} />
           <Route path="automated" element={<AutomatedTransactions />} />
           <Route path="404" element={<NotFound />} />

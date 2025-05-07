@@ -8,7 +8,6 @@ const InvestmentForm = ({
     initialAmount: '',
     description: '',
     category: '',
-    expectedReturn: '',
     date: new Date().toISOString().split('T')[0],
     coinId: '',
     coinSymbol: '',
@@ -19,6 +18,18 @@ const InvestmentForm = ({
   const [formData, setFormData] = useState(initialValues);
   const [errors, setErrors] = useState({});
   const [showCryptoSearch, setShowCryptoSearch] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState(null);
+  
+  const categories = [
+    { value: 'Stocks', label: 'Stocks', emoji: '📈' },
+    { value: 'Bonds', label: 'Bonds', emoji: '📊' },
+    { value: 'Real Estate', label: 'Real Estate', emoji: '🏠' },
+    { value: 'Cryptocurrency', label: 'Cryptocurrency', emoji: '₿' },
+    { value: 'ETF', label: 'ETF', emoji: '📑' },
+    { value: 'Mutual Funds', label: 'Mutual Funds', emoji: '💼' },
+    { value: 'Other', label: 'Other', emoji: '📦' }
+  ];
   
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -55,10 +66,6 @@ const InvestmentForm = ({
       newErrors.date = 'Please enter a valid date';
     }
     
-    if (formData.expectedReturn && (isNaN(formData.expectedReturn) || Number(formData.expectedReturn) < 0)) {
-      newErrors.expectedReturn = 'Expected return must be a positive number or zero';
-    }
-    
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -83,18 +90,32 @@ const InvestmentForm = ({
     }
   };
   
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setSubmitError(null);
     
     if (validate()) {
-      // Format data before submission
-      const finalData = {
-        ...formData,
-        initialAmount: Number(formData.initialAmount),
-        expectedReturn: formData.expectedReturn ? Number(formData.expectedReturn) : 0
-      };
-      
-      onSubmit(finalData);
+      setIsSubmitting(true);
+      try {
+        // Format data before submission
+        const finalData = {
+          ...formData,
+          initialAmount: Number(formData.initialAmount)
+        };
+        
+        // Si es una criptomoneda, mostrar información adicional sobre el proceso
+        if (formData.category === 'Cryptocurrency' && formData.coinId) {
+          console.log('Processing cryptocurrency investment...');
+          // Los usuarios verán una UI clara informando que se está procesando
+        }
+        
+        await onSubmit(finalData);
+      } catch (error) {
+        console.error('Error submitting investment:', error);
+        setSubmitError(error.message || 'Error al guardar la inversión');
+      } finally {
+        setIsSubmitting(false);
+      }
     }
   };
   
@@ -105,6 +126,12 @@ const InvestmentForm = ({
   
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
+      {submitError && (
+        <div className="bg-red-50 dark:bg-red-900/20 p-3 rounded-md text-sm text-red-800 dark:text-red-300">
+          {submitError}
+        </div>
+      )}
+      
       <div>
         <label htmlFor="category" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
           Category
@@ -119,13 +146,11 @@ const InvestmentForm = ({
           }`}
         >
           <option value="">Select a category</option>
-          <option value="Stocks">Stocks</option>
-          <option value="Bonds">Bonds</option>
-          <option value="Real Estate">Real Estate</option>
-          <option value="Cryptocurrency">Cryptocurrency</option>
-          <option value="ETF">ETF</option>
-          <option value="Mutual Funds">Mutual Funds</option>
-          <option value="Other">Other</option>
+          {categories.map(category => (
+            <option key={category.value} value={category.value}>
+              {category.emoji} {category.label}
+            </option>
+          ))}
         </select>
         {errors.category && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.category}</p>}
       </div>
@@ -186,31 +211,6 @@ const InvestmentForm = ({
       </div>
       
       <div>
-        <label htmlFor="expectedReturn" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-          Expected Annual Return (%)
-        </label>
-        <div className="relative rounded-md shadow-sm">
-          <input
-            type="number"
-            name="expectedReturn"
-            id="expectedReturn"
-            min="0"
-            step="0.1"
-            value={formData.expectedReturn}
-            onChange={handleChange}
-            className={`focus:ring-indigo-500 focus:border-indigo-500 block w-full pr-8 sm:text-sm border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white ${
-              errors.expectedReturn ? 'border-red-300 dark:border-red-500' : ''
-            }`}
-            placeholder="0.0"
-          />
-          <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-            <span className="text-gray-500 dark:text-gray-400 sm:text-sm">%</span>
-          </div>
-        </div>
-        {errors.expectedReturn && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.expectedReturn}</p>}
-      </div>
-      
-      <div>
         <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
           Description (Optional)
         </label>
@@ -245,9 +245,24 @@ const InvestmentForm = ({
       <div className="pt-2">
         <button
           type="submit"
-          className="w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:bg-indigo-700 dark:hover:bg-indigo-800 dark:focus:ring-offset-gray-800"
+          disabled={isSubmitting}
+          className={`w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white ${
+            isSubmitting 
+              ? 'bg-indigo-400 cursor-not-allowed dark:bg-indigo-600' 
+              : 'bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-700 dark:hover:bg-indigo-800'
+          } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800`}
         >
-          {buttonText}
+          {isSubmitting ? (
+            <>
+              <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Guardando...
+            </>
+          ) : (
+            buttonText
+          )}
         </button>
       </div>
     </form>
