@@ -18,30 +18,131 @@ const getAllInvestments = () => {
  * @param {Object} investment - Investment data
  * @returns {Object} Added investment with ID
  */
-const addInvestment = (investment) => {
+const addInvestment = async (investment) => {
   const investments = getAllInvestments();
-  const newInvestment = {
-    id: uuidv4(),
-    date: new Date().toISOString(),
-    initialInvestment: Number(investment.initialAmount),
-    currentValue: Number(investment.initialAmount),
-    returns: 0,
-    returnPercentage: 0,
-    ...investment
+  
+  let result = {
+    success: true,
+    data: null,
+    message: "",
+    isExistingInvestment: false
   };
   
-  // Si es una criptomoneda y tiene un coinId, intentar establecer el precio de compra
-  if (newInvestment.category === 'Cryptocurrency' && newInvestment.coinId) {
-    // Si hay un precio inicial proporcionado, usarlo como precio de compra
-    if (newInvestment.initialPrice) {
-      newInvestment.purchasePriceEUR = newInvestment.initialPrice;
+  try {
+    // Si es una criptomoneda, buscar si ya existe una inversión para esa moneda
+    if (investment.category === 'Cryptocurrency' && investment.coinId) {
+      const existingInvestment = investments.find(inv => 
+        inv.category === 'Cryptocurrency' && 
+        inv.coinId === investment.coinId
+      );
+      
+      if (existingInvestment) {
+        result.isExistingInvestment = true;
+        
+        // Obtener el precio actual de la criptomoneda
+        const priceData = await getCoinPrice(investment.coinId);
+        if (!priceData || !priceData.eur) {
+          throw new Error('Could not fetch current price for the cryptocurrency');
+        }
+        
+        const currentPrice = priceData.eur;
+        const newTokens = Number(investment.initialAmount) / currentPrice;
+        
+        // Crear un nuevo registro de compra
+        const purchaseRecord = {
+          id: uuidv4(),
+          date: new Date().toISOString(),
+          amount: Number(investment.initialAmount),
+          tokens: newTokens,
+          pricePerToken: currentPrice
+        };
+        
+        // Calcular estadísticas importantes para la respuesta
+        const previousTokenAmount = existingInvestment.initialAmount;
+        const newTotalTokens = Number(existingInvestment.initialAmount) + newTokens;
+        const newTotalInvested = Number(existingInvestment.initialInvestment) + Number(investment.initialAmount);
+        
+        // Actualizar la inversión existente
+        const updatedInvestment = {
+          ...existingInvestment,
+          initialInvestment: newTotalInvested,
+          initialAmount: newTotalTokens,
+          currentValue: newTotalTokens * currentPrice,
+          lastUpdated: new Date().toISOString(),
+          coinPriceEUR: currentPrice,
+          coinPriceUSD: priceData.usd,
+          purchaseHistory: [...(existingInvestment.purchaseHistory || []), purchaseRecord]
+        };
+        
+        // Update return values
+        const returns = updatedInvestment.currentValue - updatedInvestment.initialInvestment;
+        const returnPercentage = (returns / updatedInvestment.initialInvestment) * 100;
+        updatedInvestment.returns = returns;
+        updatedInvestment.returnPercentage = returnPercentage;
+        
+        const index = investments.indexOf(existingInvestment);
+        investments[index] = updatedInvestment;
+        saveData(KEYS.INVESTMENTS, investments);
+        
+        result.data = updatedInvestment;
+        result.message = `Added ${newTokens.toFixed(8)} ${updatedInvestment.coinSymbol} to your existing investment. You now have ${newTotalTokens.toFixed(8)} ${updatedInvestment.coinSymbol} worth €${updatedInvestment.currentValue.toFixed(2)}.`;
+        
+        return result;
+      }
     }
+    
+    // Si no es una criptomoneda o no existe una inversión previa, crear una nueva
+    const newInvestment = {
+      id: uuidv4(),
+      date: new Date().toISOString(),
+      initialInvestment: Number(investment.initialAmount),
+      currentValue: Number(investment.initialAmount),
+      returns: 0,
+      returnPercentage: 0,
+      purchaseHistory: [],
+      ...investment
+    };
+    
+    // Si es una criptomoneda, calcular la cantidad de tokens
+    if (newInvestment.category === 'Cryptocurrency' && newInvestment.coinId) {
+      const priceData = await getCoinPrice(newInvestment.coinId);
+      if (!priceData || !priceData.eur) {
+        throw new Error('Could not fetch current price for the cryptocurrency');
+      }
+      
+      newInvestment.coinPriceEUR = priceData.eur;
+      newInvestment.coinPriceUSD = priceData.usd;
+      newInvestment.initialAmount = newInvestment.initialInvestment / priceData.eur;
+      newInvestment.purchasePriceEUR = priceData.eur;
+      
+      // Añadir el primer registro de compra
+      newInvestment.purchaseHistory = [{
+        id: uuidv4(),
+        date: new Date().toISOString(),
+        amount: Number(investment.initialAmount),
+        tokens: newInvestment.initialAmount,
+        pricePerToken: priceData.eur
+      }];
+      
+      result.message = `Successfully purchased ${newInvestment.initialAmount.toFixed(8)} ${newInvestment.coinSymbol} at €${priceData.eur.toFixed(2)} per token.`;
+    } else {
+      result.message = `Successfully added investment: ${newInvestment.name}`;
+    }
+    
+    investments.push(newInvestment);
+    saveData(KEYS.INVESTMENTS, investments);
+    
+    result.data = newInvestment;
+    return result;
+  } catch (error) {
+    console.error('Error in addInvestment:', error);
+    return {
+      success: false,
+      data: null,
+      message: error.message || 'Failed to add investment',
+      isExistingInvestment: false
+    };
   }
-  
-  investments.push(newInvestment);
-  saveData(KEYS.INVESTMENTS, investments);
-  
-  return newInvestment;
 };
 
 /**
@@ -266,6 +367,29 @@ const updateCryptoHoldings = (id, data) => {
   return investments[index];
 };
 
+/**
+ * Get price history for a cryptocurrency
+ * @param {string} coinId - Coin ID
+ * @param {number} days - Number of days of history
+ * @returns {Promise<Array>} Price history data
+ */
+const getCryptoPriceHistory = async (coinId, days = 90) => {
+  try {
+    const response = await fetch(
+      `https://api.coingecko.com/api/v3/coins/${coinId}/market_chart?vs_currency=eur&days=${days}&interval=daily`
+    );
+    const data = await response.json();
+    
+    return data.prices.map(([timestamp, price]) => ({
+      date: new Date(timestamp),
+      price
+    }));
+  } catch (error) {
+    console.error('Error fetching price history:', error);
+    return [];
+  }
+};
+
 export {
   getAllInvestments,
   addInvestment,
@@ -274,5 +398,6 @@ export {
   updateInvestmentValue,
   getInvestmentStatistics,
   updateCryptoInvestmentValues,
-  updateCryptoHoldings
+  updateCryptoHoldings,
+  getCryptoPriceHistory
 }; 
