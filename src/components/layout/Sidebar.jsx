@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
 
-const Sidebar = () => {
+const Sidebar = ({ isMobileOpen = false, onCloseMobile }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   const toggleMobileSidebar = () => {
@@ -93,11 +93,15 @@ const Sidebar = () => {
     },
   ];
 
+  // Sidebar classes responsive
+  const sidebarBase = `${isCollapsed ? 'w-20' : 'w-72'} bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 transition-all duration-300 overflow-y-auto h-full`;
+  const mobileDrawer = `fixed inset-y-0 left-0 z-30 shadow-2xl transform transition-transform duration-300 lg:shadow-none lg:transform-none lg:translate-x-0 ${isMobileOpen ? 'translate-x-0' : '-translate-x-full'}`;
+  const desktopSidebar = 'hidden lg:block z-10';
+  const asideClass = `${mobileDrawer} ${sidebarBase}`;
+
   return (
-    <aside 
-      className={`fixed inset-y-0 left-0 ${isCollapsed ? 'w-20' : 'w-72'} bg-white border-r border-gray-200 z-10 transition-all duration-300 transform overflow-y-auto dark:bg-gray-800 dark:border-gray-700`}
-    >
-      {/* Logo solamente */}
+    <aside className={asideClass}>
+      {/* Header */}
       <div className={`flex items-center justify-between h-20 border-b border-gray-200 dark:border-gray-700 ${isCollapsed ? 'px-4' : 'px-6'}`}>
         {!isCollapsed && (
           <div className="flex items-center">
@@ -108,35 +112,46 @@ const Sidebar = () => {
         {isCollapsed && (
           <span className="text-3xl font-bold text-primary-500 mx-auto">Z</span>
         )}
+        {/* Botón cerrar solo en mobile */}
+        {isMobileOpen && (
+          <button
+            className="lg:hidden ml-4 p-2 rounded-full text-gray-500 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700 focus:outline-none"
+            onClick={onCloseMobile}
+            aria-label="Cerrar menú"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        )}
       </div>
-      
       {/* Navigation */}
-      <nav className={`px-4 py-6 ${isCollapsed ? 'px-2' : 'px-4'}`}>
-        <ul className="space-y-3">
+      <nav className={`py-4 ${isCollapsed ? 'px-1' : 'px-2'}`}>
+        <ul className="space-y-2">
           {navItems.map((item) => (
             <li key={item.path}>
               <NavLink 
                 to={item.path} 
                 end={item.end}
                 className={({ isActive }) => 
-                  `flex items-center ${isCollapsed ? 'justify-center' : 'px-5'} py-4 text-base font-medium rounded-lg transition-colors ${
+                  `flex items-center ${isCollapsed ? 'justify-center' : 'px-3'} py-3 text-base font-medium rounded-lg transition-colors ${
                     isActive 
                       ? 'bg-primary-50 text-primary-700 dark:bg-primary-900 dark:text-primary-100' 
                       : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700'
                   }`
                 }
                 title={item.label}
+                onClick={isMobileOpen ? onCloseMobile : undefined}
               >
-                <span className={isCollapsed ? '' : 'mr-4'}>{item.icon}</span>
+                <span className={isCollapsed ? '' : 'mr-3'}>{item.icon}</span>
                 {!isCollapsed && item.label}
               </NavLink>
             </li>
           ))}
-          
           {/* Botón para contraer/expandir sidebar */}
-          <li className="mt-8">
+          <li className="mt-6">
             <button 
-              className={`flex items-center w-full ${isCollapsed ? 'justify-center' : 'px-5'} py-4 text-base font-medium rounded-lg transition-colors text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700`}
+              className={`flex items-center w-full ${isCollapsed ? 'justify-center' : 'px-3'} py-3 text-base font-medium rounded-lg transition-colors text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700`}
               onClick={toggleCollapse}
               aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
               title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
@@ -147,7 +162,7 @@ const Sidebar = () => {
                 </svg>
               ) : (
                 <>
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
                   </svg>
                   Collapse Menu

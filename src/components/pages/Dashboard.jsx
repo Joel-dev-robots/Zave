@@ -15,11 +15,7 @@ import {
   Filler,
 } from 'chart.js';
 
-import { getCurrentBalance, getTotalIncome, getTotalExpenses } from '../../services/transactionService';
-import { getGoalStatistics } from '../../services/goalService';
-import { getInvestmentStatistics } from '../../services/investmentService';
-import { getData, KEYS } from '../../services/storageService';
-import { getAllAutomatedTransactions } from '../../services/automationService';
+import useFinancialData from '../../services/hooks/useFinancialData';
 
 // Import components
 import StatsCard from '../molecules/StatsCard';
@@ -43,13 +39,19 @@ ChartJS.register(
 );
 
 const Dashboard = () => {
-  const [balance, setBalance] = useState(0);
-  const [income, setIncome] = useState(0);
-  const [expenses, setExpenses] = useState(0);
-  const [goalStats, setGoalStats] = useState({});
-  const [investmentStats, setInvestmentStats] = useState({});
-  const [recentTransactions, setRecentTransactions] = useState([]);
-  const [automatedTransactions, setAutomatedTransactions] = useState([]);
+  const { 
+    balance, 
+    income, 
+    expenses, 
+    goalStats, 
+    investmentStats, 
+    recentTransactions, 
+    automatedTransactions,
+    isLoading,
+    transactionsProcessed,
+    processedCount
+  } = useFinancialData();
+  
   const [isDarkMode, setIsDarkMode] = useState(
     document.documentElement.classList.contains('dark')
   );
@@ -64,25 +66,13 @@ const Dashboard = () => {
     const observer = new MutationObserver(checkDarkMode);
     observer.observe(document.documentElement, { attributes: true });
     
-    // Load data
-    setBalance(getCurrentBalance());
-    setIncome(getTotalIncome());
-    setExpenses(getTotalExpenses());
-    setGoalStats(getGoalStatistics());
-    setInvestmentStats(getInvestmentStatistics());
-    
-    // Cargar automatizaciones
-    setAutomatedTransactions(getAllAutomatedTransactions().filter(at => at.active));
-    
-    // Get recent transactions
-    const allTransactions = getData(KEYS.TRANSACTIONS, []);
-    const sorted = [...allTransactions]
-      .sort((a, b) => new Date(b.date) - new Date(a.date))
-      .slice(0, 5);
-    setRecentTransactions(sorted);
+    // Log if transactions were processed
+    if (transactionsProcessed) {
+      console.log(`Processed ${processedCount} automated transactions`);
+    }
     
     return () => observer.disconnect();
-  }, []);
+  }, [transactionsProcessed, processedCount]);
 
   // Income vs Expenses Chart
   const comparisonChartData = {
@@ -244,230 +234,230 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-        <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100">Financial Dashboard</h1>
-      </div>
+    <div className="p-0">
+      <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100 p-6 border-b border-gray-200 dark:border-gray-700">Financial Dashboard</h1>
       
-      {/* Summary Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        <StatsCard 
-          title="Current Balance"
-          value={`€${balance.toFixed(2)}`}
-          variant={balance >= 0 ? "primary" : "danger"}
-          icon={
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
-            </svg>
-          }
-        />
-        
-        <StatsCard 
-          title="Total Income"
-          value={`€${income.toFixed(2)}`}
-          variant="success"
-          icon={
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-            </svg>
-          }
-        />
-        
-        <StatsCard 
-          title="Total Expenses"
-          value={`€${expenses.toFixed(2)}`}
-          variant="danger"
-          icon={
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4"></path>
-            </svg>
-          }
-        />
-        
-        <StatsCard 
-          title="Savings Rate"
-          value={income > 0 ? `${Math.round((income - expenses) / income * 100)}%` : '0%'}
-          variant="warning"
-          icon={
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
-            </svg>
-          }
-        />
-      </div>
-      
-      {/* Charts Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <ChartCard 
-          title="Balance Trend"
-          chart={
-            <div className="h-80">
-              <Line data={balanceChartData} options={balanceChartOptions} />
-            </div>
-          }
-        />
-        
-        <ChartCard 
-          title="Income vs Expenses"
-          chart={
-            <div className="h-80">
-              <Bar data={comparisonChartData} options={comparisonChartOptions} />
-            </div>
-          }
-        />
-      </div>
-      
-      {/* Transactions & Goals Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Recent Transactions */}
-        <Card>
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-slate-700 dark:text-slate-200">Recent Transactions</h2>
-            <div className="flex space-x-2">
-              <Link to="/income">
-                <Button variant="tertiary" size="sm">View All</Button>
-              </Link>
-            </div>
-          </div>
-          
-          <TransactionList 
-            transactions={recentTransactions}
+      <div className="p-6 space-y-6">
+        {/* Summary Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <StatsCard 
+            title="Current Balance"
+            value={`€${balance.toFixed(2)}`}
+            variant={balance >= 0 ? "primary" : "danger"}
+            icon={
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
+              </svg>
+            }
           />
-        </Card>
+          
+          <StatsCard 
+            title="Total Income"
+            value={`€${income.toFixed(2)}`}
+            variant="success"
+            icon={
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+              </svg>
+            }
+          />
+          
+          <StatsCard 
+            title="Total Expenses"
+            value={`€${expenses.toFixed(2)}`}
+            variant="danger"
+            icon={
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4"></path>
+              </svg>
+            }
+          />
+          
+          <StatsCard 
+            title="Savings Rate"
+            value={income > 0 ? `${Math.round((income - expenses) / income * 100)}%` : '0%'}
+            variant="warning"
+            icon={
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+              </svg>
+            }
+          />
+        </div>
         
-        {/* Financial Goals Summary */}
+        {/* Charts Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <ChartCard 
+            title="Balance Trend"
+            chart={
+              <div className="h-80 text-left">
+                <Line data={balanceChartData} options={balanceChartOptions} />
+              </div>
+            }
+          />
+          
+          <ChartCard 
+            title="Income vs Expenses"
+            chart={
+              <div className="h-80 text-left">
+                <Bar data={comparisonChartData} options={comparisonChartOptions} />
+              </div>
+            }
+          />
+        </div>
+        
+        {/* Transactions & Goals Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Recent Transactions */}
+          <Card>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold text-slate-700 dark:text-slate-200 text-left">Recent Transactions</h2>
+              <div className="flex space-x-2">
+                <Link to="/income">
+                  <Button variant="tertiary" size="sm">View All</Button>
+                </Link>
+              </div>
+            </div>
+            
+            <TransactionList 
+              transactions={recentTransactions}
+            />
+          </Card>
+          
+          {/* Financial Goals Summary */}
+          <Card>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold text-slate-700 dark:text-slate-200 text-left">Financial Goals</h2>
+              <div className="flex space-x-2">
+                <Link to="/goals">
+                  <Button variant="tertiary" size="sm">Manage Goals</Button>
+                </Link>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4 mb-4">
+              <div className="bg-primary-50 p-4 rounded-lg dark:bg-primary-900/30">
+                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Total Goals</p>
+                <p className="text-xl font-bold text-primary-700 dark:text-primary-300">{goalStats.total || 0}</p>
+              </div>
+              
+              <div className="bg-success-50 p-4 rounded-lg dark:bg-success-900/30">
+                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Completed</p>
+                <p className="text-xl font-bold text-success-700 dark:text-success-300">{goalStats.completed || 0}</p>
+              </div>
+            </div>
+            
+            {/* Progress of active goals would go here */}
+            <div className="space-y-4">
+              <div>
+                <div className="flex justify-between mb-1">
+                  <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300">Overall Progress</h3>
+                  <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                    {goalStats.averageProgress ? goalStats.averageProgress.toFixed(0) : 0}%
+                  </span>
+                </div>
+                <ProgressBar 
+                  progress={goalStats.averageProgress || 0} 
+                  variant="primary"
+                  size="md"
+                />
+              </div>
+            </div>
+          </Card>
+        </div>
+        
+        {/* Automated Transactions Section */}
+        {automatedTransactions.length > 0 && (
+          <Card>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold text-slate-700 dark:text-slate-200 text-left">Transacciones Automáticas</h2>
+              <div className="flex space-x-2">
+                <Link to="/automated">
+                  <Button variant="tertiary" size="sm">Administrar</Button>
+                </Link>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {automatedTransactions.slice(0, 6).map(transaction => (
+                <div key={transaction.id} className={`p-4 rounded-lg border ${
+                  transaction.type === 'income' 
+                    ? 'border-success-200 bg-success-50 dark:border-success-800/50 dark:bg-success-900/30' 
+                    : 'border-danger-200 bg-danger-50 dark:border-danger-800/50 dark:bg-danger-900/30'
+                }`}>
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h3 className="font-medium text-slate-800 dark:text-slate-200">{transaction.name}</h3>
+                      <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                        {transaction.category || transaction.frequency}
+                      </p>
+                    </div>
+                    <span className={`font-semibold ${
+                      transaction.type === 'income' 
+                        ? 'text-success-600 dark:text-success-400' 
+                        : 'text-danger-600 dark:text-danger-400'
+                    }`}>
+                      {transaction.type === 'income' ? '+' : '-'}€{typeof transaction.amount === 'number' ? transaction.amount.toFixed(2) : parseFloat(transaction.amount).toFixed(2)}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+            
+            {automatedTransactions.length > 6 && (
+              <div className="mt-4 text-center">
+                <Link to="/automated">
+                  <Button variant="tertiary" size="sm">
+                    Ver todas ({automatedTransactions.length})
+                  </Button>
+                </Link>
+              </div>
+            )}
+          </Card>
+        )}
+        
+        {/* Investments Summary */}
         <Card>
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-slate-700 dark:text-slate-200">Financial Goals</h2>
+            <h2 className="text-lg font-semibold text-slate-700 dark:text-slate-200 text-left">Investments</h2>
             <div className="flex space-x-2">
-              <Link to="/goals">
-                <Button variant="tertiary" size="sm">Manage Goals</Button>
+              <Link to="/investments">
+                <Button variant="tertiary" size="sm">View Details</Button>
               </Link>
             </div>
           </div>
           
-          <div className="grid grid-cols-2 gap-4 mb-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="bg-gray-50 p-4 rounded-lg dark:bg-gray-800/50">
+              <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Total Invested</p>
+              <p className="text-xl font-bold text-slate-700 dark:text-slate-200">
+                €{investmentStats.totalInvested ? investmentStats.totalInvested.toFixed(2) : '0.00'}
+              </p>
+            </div>
+            
             <div className="bg-primary-50 p-4 rounded-lg dark:bg-primary-900/30">
-              <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Total Goals</p>
-              <p className="text-xl font-bold text-primary-700 dark:text-primary-300">{goalStats.total || 0}</p>
+              <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Current Value</p>
+              <p className="text-xl font-bold text-primary-700 dark:text-primary-300">
+                €{investmentStats.currentValue ? investmentStats.currentValue.toFixed(2) : '0.00'}
+              </p>
             </div>
             
             <div className="bg-success-50 p-4 rounded-lg dark:bg-success-900/30">
-              <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Completed</p>
-              <p className="text-xl font-bold text-success-700 dark:text-success-300">{goalStats.completed || 0}</p>
+              <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Total Return</p>
+              <p className="text-xl font-bold text-success-700 dark:text-success-300">
+                €{investmentStats.totalReturn ? investmentStats.totalReturn.toFixed(2) : '0.00'}
+              </p>
             </div>
-          </div>
-          
-          {/* Progress of active goals would go here */}
-          <div className="space-y-4">
-            <div>
-              <div className="flex justify-between mb-1">
-                <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300">Overall Progress</h3>
-                <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                  {goalStats.averageProgress ? goalStats.averageProgress.toFixed(0) : 0}%
-                </span>
-              </div>
-              <ProgressBar 
-                progress={goalStats.averageProgress || 0} 
-                variant="primary"
-                size="md"
-              />
+            
+            <div className="bg-warning-50 p-4 rounded-lg dark:bg-warning-900/30">
+              <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Return Rate</p>
+              <p className="text-xl font-bold text-warning-700 dark:text-warning-300">
+                {investmentStats.returnRate ? investmentStats.returnRate.toFixed(2) : '0.00'}%
+              </p>
             </div>
           </div>
         </Card>
       </div>
-      
-      {/* Automated Transactions Section */}
-      {automatedTransactions.length > 0 && (
-        <Card>
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-slate-700 dark:text-slate-200">Transacciones Automáticas</h2>
-            <div className="flex space-x-2">
-              <Link to="/automated">
-                <Button variant="tertiary" size="sm">Administrar</Button>
-              </Link>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {automatedTransactions.slice(0, 6).map(transaction => (
-              <div key={transaction.id} className={`p-4 rounded-lg border ${
-                transaction.type === 'income' 
-                  ? 'border-success-200 bg-success-50 dark:border-success-800/50 dark:bg-success-900/30' 
-                  : 'border-danger-200 bg-danger-50 dark:border-danger-800/50 dark:bg-danger-900/30'
-              }`}>
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h3 className="font-medium text-slate-800 dark:text-slate-200">{transaction.name}</h3>
-                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                      {transaction.category || transaction.frequency}
-                    </p>
-                  </div>
-                  <span className={`font-semibold ${
-                    transaction.type === 'income' 
-                      ? 'text-success-600 dark:text-success-400' 
-                      : 'text-danger-600 dark:text-danger-400'
-                  }`}>
-                    {transaction.type === 'income' ? '+' : '-'}€{typeof transaction.amount === 'number' ? transaction.amount.toFixed(2) : parseFloat(transaction.amount).toFixed(2)}
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-          
-          {automatedTransactions.length > 6 && (
-            <div className="mt-4 text-center">
-              <Link to="/automated">
-                <Button variant="tertiary" size="sm">
-                  Ver todas ({automatedTransactions.length})
-                </Button>
-              </Link>
-            </div>
-          )}
-        </Card>
-      )}
-      
-      {/* Investments Summary */}
-      <Card>
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold text-slate-700 dark:text-slate-200">Investments</h2>
-          <div className="flex space-x-2">
-            <Link to="/investments">
-              <Button variant="tertiary" size="sm">View Details</Button>
-            </Link>
-          </div>
-        </div>
-        
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="bg-gray-50 p-4 rounded-lg dark:bg-gray-800/50">
-            <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Total Invested</p>
-            <p className="text-xl font-bold text-slate-700 dark:text-slate-200">
-              €{investmentStats.totalInvested ? investmentStats.totalInvested.toFixed(2) : '0.00'}
-            </p>
-          </div>
-          
-          <div className="bg-primary-50 p-4 rounded-lg dark:bg-primary-900/30">
-            <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Current Value</p>
-            <p className="text-xl font-bold text-primary-700 dark:text-primary-300">
-              €{investmentStats.currentValue ? investmentStats.currentValue.toFixed(2) : '0.00'}
-            </p>
-          </div>
-          
-          <div className="bg-success-50 p-4 rounded-lg dark:bg-success-900/30">
-            <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Total Return</p>
-            <p className="text-xl font-bold text-success-700 dark:text-success-300">
-              €{investmentStats.totalReturn ? investmentStats.totalReturn.toFixed(2) : '0.00'}
-            </p>
-          </div>
-          
-          <div className="bg-warning-50 p-4 rounded-lg dark:bg-warning-900/30">
-            <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Return Rate</p>
-            <p className="text-xl font-bold text-warning-700 dark:text-warning-300">
-              {investmentStats.returnRate ? investmentStats.returnRate.toFixed(2) : '0.00'}%
-            </p>
-          </div>
-        </div>
-      </Card>
     </div>
   );
 };

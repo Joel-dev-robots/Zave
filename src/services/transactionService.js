@@ -110,6 +110,20 @@ const getCurrentBalance = () => {
   return getTotalIncome() - getTotalExpenses();
 };
 
+/**
+ * Process automated transactions and return updated financial data
+ * @returns {Object} Updated financial data
+ */
+const processAndGetFinancialData = () => {
+  // This function is meant to be used by components that need the latest financial data
+  // including any newly processed automated transactions
+  return {
+    balance: getCurrentBalance(),
+    income: getTotalIncome(),
+    expenses: getTotalExpenses(),
+  };
+};
+
 export {
   getAllTransactions,
   addTransaction,
@@ -119,5 +133,6 @@ export {
   getExpenseTransactions,
   getTotalIncome,
   getTotalExpenses,
-  getCurrentBalance
+  getCurrentBalance,
+  processAndGetFinancialData
 }; 

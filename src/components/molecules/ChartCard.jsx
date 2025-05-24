@@ -25,7 +25,9 @@ const ChartCard = ({
     >
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-semibold text-slate-700 dark:text-slate-200">{title}</h2>
+        <h2 className="text-lg font-semibold text-slate-700 dark:text-slate-200 text-left">
+          {title}
+        </h2>
         {toolbar && (
           <div className="flex items-center">
             {toolbar}
@@ -34,13 +36,13 @@ const ChartCard = ({
       </div>
       
       {/* Chart content */}
-      <div className="relative">
+      <div className="relative text-left">
         {chart}
       </div>
       
       {/* Optional footer */}
       {footer && (
-        <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
+        <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700 text-left">
           {footer}
         </div>
       )}

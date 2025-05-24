@@ -144,9 +144,15 @@ export const processAutomatedTransactions = () => {
   // Guardar las automatizaciones actualizadas
   if (processedTransactions.length > 0) {
     saveData(KEYS.AUTOMATED_TRANSACTIONS, updatedAutomations);
+    
+    // Store the last processed date in localStorage
+    localStorage.setItem('last_auto_processed', today);
   }
   
-  return processedTransactions;
+  return {
+    transactions: processedTransactions,
+    processed: processedTransactions.length > 0
+  };
 };
 
 // Obtener todas las automatizaciones

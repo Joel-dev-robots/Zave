@@ -24,7 +24,7 @@ const Card = ({
   
   // Combined classes
   const combinedClasses = [
-    'rounded-lg shadow-md p-6',
+    'rounded-lg shadow-md p-5 text-left',
     variantClasses[variant],
     className
   ].join(' ');

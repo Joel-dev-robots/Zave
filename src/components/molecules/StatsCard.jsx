@@ -25,7 +25,7 @@ const StatsCard = ({
   return (
     <Card 
       variant={variant}
-      className={`flex items-center ${className}`}
+      className={`flex items-start ${className}`}
       {...rest}
     >
       {/* Icon container */}
@@ -43,7 +43,7 @@ const StatsCard = ({
       )}
       
       {/* Content */}
-      <div className="flex-1">
+      <div className="flex-1 text-left">
         <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">{title}</h3>
         <div className="flex items-end">
           <div className={`text-2xl font-bold ${

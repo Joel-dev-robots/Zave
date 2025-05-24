@@ -56,10 +56,10 @@ const Layout = () => {
   }, []);
   
   return (
-    <div className="min-h-screen bg-gray-50 flex dark:bg-gray-900">
-      {/* Sidebar - desktop always visible, mobile toggled */}
-      <div className={`lg:block ${isMobileSidebarOpen ? 'block' : 'hidden'}`}>
-        <Sidebar />
+    <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
+      {/* Sidebar */}
+      <div className="lg:block h-full">
+        <Sidebar isMobileOpen={isMobileSidebarOpen} onCloseMobile={toggleMobileSidebar} />
       </div>
       
       {/* Mobile sidebar overlay */}
@@ -70,25 +70,23 @@ const Layout = () => {
         ></div>
       )}
       
-      {/* Main content area */}
-      <div className={`flex flex-col flex-1 ${isSidebarCollapsed ? 'lg:ml-20' : 'lg:ml-72'} transition-all duration-300`}>
-        {/* Mobile Menu Button with Z - positioned where X used to be */}
+      {/* Main content */}
+      <div className={`${isSidebarCollapsed ? 'lg:ml-20' : 'lg:ml-72'} flex-1 flex flex-col transition-all duration-300 w-full`}>
+        {/* Mobile Menu Button */}
         <button 
-          className="fixed top-7 right-6 p-2 z-40 rounded-full bg-primary-500 shadow-lg lg:hidden flex flex-col items-center justify-center text-white dark:bg-primary-700"
+          className="fixed top-7 right-6 p-2 z-40 rounded-full bg-primary-500 shadow-lg lg:hidden flex items-center justify-center text-white dark:bg-primary-700"
           onClick={toggleMobileSidebar}
           aria-label={isMobileSidebarOpen ? "Close menu" : "Open menu"}
         >
           <span className="text-xl font-bold">Z</span>
         </button>
         
-        <main className="flex-1 p-5 md:p-6 lg:p-8 overflow-auto dark:bg-gray-900">
-          <div className="w-full mx-auto">
-            <Outlet />
-          </div>
+        <main className="flex-1 overflow-auto h-full w-full">
+          <Outlet />
         </main>
       </div>
 
-      {/* Botón flotante para cambiar entre modo claro/oscuro */}
+      {/* Dark mode toggle button */}
       <button 
         className="fixed right-6 bottom-6 p-3 rounded-full bg-white shadow-lg text-gray-700 hover:bg-gray-100 focus:outline-none transition-colors z-50 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
         onClick={toggleDarkMode}

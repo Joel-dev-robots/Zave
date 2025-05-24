@@ -17,7 +17,6 @@ import NotFound from './components/pages/NotFound';
 // Servicios
 import { initializeStorage } from './services/storageService';
 import { initializeSettings } from './services/settingsService';
-import { processAutomatedTransactions } from './services/automationService';
 
 function App() {
   // Inicializar almacenamiento y configuraciones al cargar
@@ -25,24 +24,8 @@ function App() {
     initializeStorage();
     initializeSettings(); // Inicializar las categorías y configuraciones
     
-    // Verificar transacciones automáticas una vez al día
-    // Solo comprobamos una vez al día para no procesar múltiples veces
-    const lastProcessed = localStorage.getItem('last_auto_processed');
-    const today = new Date().toDateString();
-    
-    if (!lastProcessed || lastProcessed !== today) {
-      // Procesar transacciones automáticas pendientes
-      const processedTransactions = processAutomatedTransactions();
-      if (processedTransactions.length > 0) {
-        console.log(`Procesadas ${processedTransactions.length} transacciones automáticas`);
-      }
-      
-      // Guardar la fecha de último procesamiento
-      localStorage.setItem('last_auto_processed', today);
-    }
-    
-    // No configuramos un intervalo para no crear bucles infinitos
-    // Las automatizaciones se verificarán cada vez que el usuario cargue la aplicación
+    // Note: We've moved the automated transaction processing to the Dashboard component
+    // to ensure financial data is always in sync with processed transactions
   }, []);
 
   return (
