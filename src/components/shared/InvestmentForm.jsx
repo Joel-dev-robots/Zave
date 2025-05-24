@@ -45,6 +45,36 @@ const InvestmentForm = ({
         [name]: null
       }));
     }
+    
+    // Clear submit error when user makes changes
+    if (submitError) {
+      setSubmitError(null);
+    }
+  };
+  
+  // CoinGecko API limitations for historical data
+  const getDateConstraints = () => {
+    const today = new Date().toISOString().split('T')[0];
+    
+    if (formData.category === 'Cryptocurrency') {
+      // Limit to 1 year back for cryptocurrency investments
+      const oneYearAgo = new Date();
+      oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+      const earliestDate = oneYearAgo.toISOString().split('T')[0];
+      
+      return {
+        min: earliestDate,
+        max: today,
+        helpText: 'Cryptocurrency purchases can only be registered within the last year due to API limitations.'
+      };
+    } else {
+      // For non-crypto investments, allow any past date
+      return {
+        min: '1900-01-01',
+        max: today,
+        helpText: null
+      };
+    }
   };
   
   const validate = () => {
@@ -64,6 +94,22 @@ const InvestmentForm = ({
     
     if (!formData.date) {
       newErrors.date = 'Please enter a valid date';
+    } else {
+      // Validate date constraints
+      const dateConstraints = getDateConstraints();
+      const selectedDate = new Date(formData.date);
+      const minDate = new Date(dateConstraints.min);
+      const maxDate = new Date(dateConstraints.max);
+      
+      if (selectedDate > maxDate) {
+        newErrors.date = 'Investment date cannot be in the future.';
+      } else if (selectedDate < minDate) {
+        if (formData.category === 'Cryptocurrency') {
+          newErrors.date = 'Cryptocurrency purchases cannot be registered with more than 1 year of historical data due to API limitations.';
+        } else {
+          newErrors.date = 'Please select a valid date.';
+        }
+      }
     }
     
     setErrors(newErrors);
@@ -100,14 +146,14 @@ const InvestmentForm = ({
         // Format data before submission
         const finalData = {
           ...formData,
-          initialAmount: Number(formData.initialAmount)
+          initialAmount: Number(formData.initialAmount),
+          investmentDate: formData.date // Map 'date' field to 'investmentDate'
         };
         
-        // Si es una criptomoneda, mostrar información adicional sobre el proceso
-        if (formData.category === 'Cryptocurrency' && formData.coinId) {
-          console.log('Processing cryptocurrency investment...');
-          // Los usuarios verán una UI clara informando que se está procesando
-        }
+        // Remove the date field to avoid confusion
+        delete finalData.date;
+        
+        console.log('Submitting investment data:', finalData);
         
         await onSubmit(finalData);
       } catch (error) {
@@ -191,7 +237,7 @@ const InvestmentForm = ({
         </label>
         <div className="relative rounded-md shadow-sm">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <span className="text-gray-500 dark:text-gray-400 sm:text-sm">€</span>
+            <span className="text-gray-500 dark:text-gray-400 sm:text-sm">$</span>
           </div>
           <input
             type="number"
@@ -235,10 +281,20 @@ const InvestmentForm = ({
           id="date"
           value={formData.date}
           onChange={handleChange}
+          min={getDateConstraints().min}
+          max={getDateConstraints().max}
           className={`focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white ${
             errors.date ? 'border-red-300 dark:border-red-500' : ''
           }`}
         />
+        {getDateConstraints().helpText && (
+          <p className="mt-1 text-xs text-blue-600 dark:text-blue-400">
+            <svg className="inline w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+              <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd"></path>
+            </svg>
+            {getDateConstraints().helpText}
+          </p>
+        )}
         {errors.date && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.date}</p>}
       </div>
       

@@ -1,6 +1,3 @@
-///molaría automatizar también las inversiones, y de algun modo acabar viendo si se alcanzan los objetivos o incluso tener una parte que lo que
-permita al user es tener la visión a largo plazo que puede suponer tener ese tipo de estratégia económica
-
 # Zave Finance App
 
 ## 📊 Personal Finance Manager with a Modern UI

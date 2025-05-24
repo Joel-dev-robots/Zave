@@ -33,18 +33,18 @@ export const searchCryptoCoins = async (query) => {
 export const getCoinPrice = async (coinId) => {
   try {
     const response = await fetch(
-      `${COINGECKO_API_BASE_URL}/simple/price?ids=${coinId}&vs_currencies=eur,usd&include_24hr_change=true`
+      `${COINGECKO_API_BASE_URL}/simple/price?ids=${coinId}&vs_currencies=usd&include_24hr_change=true`
     );
+    const data = await response.json();
     
-    if (!response.ok) {
-      throw new Error('CoinGecko API error: ' + response.status);
+    if (!data[coinId]) {
+      throw new Error(`Price data not found for ${coinId}`);
     }
     
-    const data = await response.json();
-    return data[coinId] || null;
+    return data[coinId];
   } catch (error) {
     console.error('Error fetching coin price:', error);
-    return null;
+    throw error;
   }
 };
 
@@ -71,13 +71,13 @@ export const getCoinDetails = async (coinId) => {
 };
 
 /**
- * Get coin market chart data
- * @param {string} coinId - CoinGecko coin ID
- * @param {number} days - Number of days of data
- * @param {string} currency - Currency (default: eur)
- * @returns {Promise<Object>} - Chart data
+ * Get historical market data for a coin
+ * @param {string} coinId - Coin ID
+ * @param {number} days - Number of days
+ * @param {string} currency - Currency (default: usd)
+ * @returns {Promise<Object>} Market chart data
  */
-export const getCoinMarketChart = async (coinId, days = 30, currency = 'eur') => {
+export const getCoinMarketChart = async (coinId, days = 30, currency = 'usd') => {
   try {
     const response = await fetch(
       `${COINGECKO_API_BASE_URL}/coins/${coinId}/market_chart?vs_currency=${currency}&days=${days}`

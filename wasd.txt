@@ -1,0 +1,165 @@
+<role>
+You are a senior full-stack developer tasked with completely redesigning and fixing the investment management system in a React-based financial application called Zave. The current system has fundamental flaws in profit calculations, date handling, and user experience design. You need to rebuild this feature from the ground up with a focus on accuracy, simplicity, and exceptional user experience while maintaining the existing data structure compatibility.
+</role>
+
+<problem_overview>
+The current investment management system in Zave has critical design and calculation flaws that make it unreliable for users. The profit calculation logic incorrectly treats manual value updates as gains (updating holdings from €1000 to €10000 shows 900% profit instead of recognizing it as a manual adjustment), purchase history dates are incorrectly saved as creation time instead of the user-specified investment date, the UI is cluttered with irrelevant elements that distract from core functionality, and the cryptocurrency display lacks essential information like current ticker prices and individual purchase performance. Your mission is to redesign this feature completely with accurate financial calculations, clean intuitive UI focused solely on investment tracking, proper date handling, and enhanced cryptocurrency-specific features that provide real value to users.
+</problem_overview>
+
+<data_contracts>
+Redesigned Investment Schema:
+```typescript
+interface Investment {
+  id: string;
+  name: string;
+  category: 'Stocks' | 'Bonds' | 'Real Estate' | 'Cryptocurrency' | 'ETF' | 'Mutual Funds' | 'Other';
+  totalInvested: number; // Sum of all actual money invested
+  currentMarketValue: number; // Calculated from current prices, not manual updates
+  realizedGains: number; // Only from actual sales/withdrawals
+  unrealizedGains: number; // Paper gains from price movements
+  createdAt: string;
+  lastPriceUpdate?: string;
+  // Crypto-specific fields
+  coinId?: string;
+  coinSymbol?: string;
+  coinThumb?: string;
+  currentPriceUSD: number;
+  currentPriceEUR: number;
+  totalTokens: number; // Sum of all tokens owned
+  purchases: Purchase[];
+}
+
+interface Purchase {
+  id: string;
+  investmentDate: string; // User-specified date, NOT creation timestamp
+  createdAt: string; // When record was created in system
+  amountInvested: number; // Money actually spent
+  tokensAcquired: number; // For crypto
+  pricePerTokenUSD: number; // Historical price at purchase
+  pricePerTokenEUR: number;
+  currentValue: number; // Calculated field
+  unrealizedGain: number; // Calculated field
+  unrealizedGainPercentage: number; // Calculated field
+}
+```
+
+UI Component Structure:
+```typescript
+// Clean, focused component hierarchy
+InvestmentOverview: Portfolio summary cards only
+InvestmentList: Streamlined investment cards
+  - InvestmentCard: Ticker, current price, total gain/loss
+  - InvestmentDetails: Purchase history with individual performance
+  - CryptoDetails: USD prices, token amounts, price changes
+AddInvestmentForm: Simplified form with smart defaults
+EditInvestmentForm: Allow editing of purchase records, not total values
+```
+
+Calculation Logic Contracts:
+- Manual value updates are treated as data corrections, not gains
+- Profit calculations only based on price movements vs purchase prices
+- Individual purchase performance tracked separately
+- Total portfolio performance aggregated from individual purchases
+- No percentage calculations on manual adjustments
+</data_contracts>
+
+<implementation_steps>
+
+Phase 1: Core Logic Redesign & Data Migration
+- Implement new financial calculation engine with proper gain/loss logic
+- Create data migration service to convert existing investments to new schema
+- Build purchase-based profit calculation system (individual + aggregated)
+- Fix date handling to respect user-specified investment dates vs system timestamps
+- Add comprehensive validation for financial data integrity
+- Implement debug logging for all calculation steps and data transformations
+
+Phase 2: Streamlined UI Redesign
+- Redesign investment cards to show only essential information: name, current value, total gain/loss percentage
+- Create clean cryptocurrency display with ticker symbol, current USD/EUR price, and 24h change indicator
+- Remove price evolution charts and replace with simple price change indicators
+- Simplify investment list to focus on key metrics without visual clutter
+- Design mobile-first responsive layout with clean typography and spacing
+- Add loading skeletons and smooth transitions for better perceived performance
+
+Phase 3: Enhanced Cryptocurrency Features
+- Display current ticker price prominently for all crypto investments
+- Show total tokens owned and current market value
+- Create detailed purchase history view with individual purchase performance
+- Display each purchase: date, amount invested (USD), tokens acquired, purchase price, current value, gain/loss
+- Add color-coded performance indicators (green/red) for quick visual feedback
+- Implement automatic price updates with clear last-updated timestamps
+
+Phase 4: Investment Management Improvements
+- Redesign add investment form with better cryptocurrency search and selection
+- Allow editing of individual purchase records instead of total investment values
+- Create batch operations for multiple purchases of same investment
+- Add investment date picker with validation (no future dates)
+- Implement purchase record deletion with recalculated totals
+- Add data export functionality for tax reporting
+
+Phase 5: Testing & Validation
+- Create comprehensive test suite for financial calculations
+- Test data migration scenarios with existing user data
+- Validate profit/loss calculations against known benchmarks
+- Test UI responsiveness and accessibility
+- Performance testing with large investment portfolios
+
+</implementation_steps>
+
+<external_dependencies>
+Required Packages (use latest versions):
+- Core: react, react-router-dom, uuid, date-fns
+- HTTP Client: axios with retry logic and caching
+- UI Components: Custom components using existing Tailwind classes
+- Data Validation: zod for schema validation
+- Testing: @testing-library/react, jest
+- Utilities: lodash (for financial calculations and data manipulation)
+
+API Integration Requirements:
+- CoinGecko API with intelligent caching and rate limiting
+- Price update service with configurable intervals
+- Error handling with fallback to cached data
+- Currency conversion service for USD/EUR display
+
+Development Guidelines:
+- Use Context7 MCP to research best practices for financial calculations in JavaScript
+- If Context7 unavailable, web search for financial calculation libraries and patterns
+- Implement TypeScript for type safety in financial operations
+- Follow clean architecture principles with clear separation of concerns
+- Create reusable hooks for investment calculations and data management
+
+</external_dependencies>
+
+<critical_fixes>
+Financial Logic Corrections:
+- Fix profit calculation: Only calculate gains based on price movements, not manual value updates
+- Implement proper purchase-based tracking: Each purchase tracked individually with its own performance
+- Correct date handling: Use user-specified investment date, not system creation timestamp
+- Add validation: Prevent future dates, ensure positive amounts, validate price data
+
+UI/UX Improvements Required:
+- Remove unnecessary visual elements and focus on core investment data
+- Implement clear hierarchy: Portfolio overview → Investment list → Individual details
+- Add prominent ticker display for cryptocurrencies with real-time price updates
+- Create intuitive purchase history with individual performance metrics
+- Design clear profit/loss indicators with proper color coding and formatting
+
+Data Integrity Measures:
+- Implement transaction logging for all investment modifications
+- Add data backup before migrations or major updates
+- Create validation checks for financial calculation accuracy
+- Build automated tests for edge cases in profit calculations
+
+</critical_fixes>
+
+<debug_requirements>
+Add extensive logging for financial operations:
+- All profit/loss calculations with input values and formulas used
+- Date processing and validation steps
+- API price updates with timestamps and cache status
+- Data migration steps with before/after comparisons
+- User interactions that modify investment data
+- Error scenarios with full context and recovery actions
+Use structured logging with categories: CALCULATION, API, UI_ACTION, DATA_MIGRATION, ERROR
+Include performance timing for all financial calculations and API operations.
+</debug_requirements>

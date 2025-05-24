@@ -8,7 +8,8 @@ import Layout from './components/layout/Layout';
 import Dashboard from './components/pages/Dashboard';
 import Income from './components/pages/Income';
 import Expenses from './components/pages/Expenses';
-import Investments from './components/pages/Investments';
+import RedesignedInvestments from './components/pages/RedesignedInvestments';
+import InvestmentDetails from './components/pages/InvestmentDetails';
 import ChronologicalHistory from './components/pages/ChronologicalHistory';
 import Goals from './components/pages/Goals';
 import AutomatedTransactions from './components/pages/AutomatedTransactions';
@@ -35,7 +36,8 @@ function App() {
           <Route index element={<Dashboard />} />
           <Route path="income" element={<Income />} />
           <Route path="expenses" element={<Expenses />} />
-          <Route path="investments" element={<Investments />} />
+          <Route path="investments" element={<RedesignedInvestments />} />
+          <Route path="investment-details/:id" element={<InvestmentDetails />} />
           <Route path="investments/history" element={<ChronologicalHistory />} />
           <Route path="goals" element={<Goals />} />
           <Route path="automated" element={<AutomatedTransactions />} />

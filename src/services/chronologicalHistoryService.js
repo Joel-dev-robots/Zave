@@ -16,7 +16,7 @@ const getChronologicalHistory = () => {
       // Añadir cada compra como una transacción separada
       investment.purchaseHistory.forEach(purchase => {
         // Calcular el valor actual de esta compra específica
-        const currentTokenPrice = investment.coinPriceEUR || 0;
+        const currentTokenPrice = investment.coinPriceUSD || 0;
         const currentValueOfPurchase = purchase.tokens * currentTokenPrice;
         const returnAmount = currentValueOfPurchase - purchase.amount;
         const returnPercentage = (returnAmount / purchase.amount) * 100;
@@ -52,8 +52,8 @@ const getChronologicalHistory = () => {
         currentReturnPercentage: investment.returnPercentage,
         // Datos específicos de cripto si aplica
         tokens: investment.category === 'Cryptocurrency' ? investment.initialAmount : null,
-        pricePerToken: investment.category === 'Cryptocurrency' ? investment.purchasePriceEUR : null,
-        currentPricePerToken: investment.category === 'Cryptocurrency' ? investment.coinPriceEUR : null,
+        pricePerToken: investment.category === 'Cryptocurrency' ? investment.purchasePriceUSD : null,
+        currentPricePerToken: investment.category === 'Cryptocurrency' ? investment.coinPriceUSD : null,
         symbol: investment.category === 'Cryptocurrency' ? investment.coinSymbol : null,
         coinThumb: investment.category === 'Cryptocurrency' ? investment.coinThumb : null
       });
